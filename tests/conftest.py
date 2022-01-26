@@ -36,12 +36,14 @@ def model_input() -> pd.DataFrame:
 
 
 @pytest.fixture(scope="session")
-def model_output() -> np.array:
-    return np.array([42] * 5)
+def model_output(model_input: pd.DataFrame) -> np.array:
+    return DeepThought().predict(context=None, model_input=model_input)
 
 
 @pytest.fixture(scope="session")
-def signature(model_input: pd.DataFrame, model_output: np.array) -> ModelSignature:
+def model_signature(
+    model_input: pd.DataFrame, model_output: np.array
+) -> ModelSignature:
     return infer_signature(
         model_input=model_input,
         model_output=model_output,
@@ -49,10 +51,10 @@ def signature(model_input: pd.DataFrame, model_output: np.array) -> ModelSignatu
 
 
 @pytest.fixture(scope="session")
-def pyfunc_model(signature: ModelSignature) -> PyFuncModel:
+def pyfunc_model(model_signature: ModelSignature) -> PyFuncModel:
     with TemporaryDirectory() as temp_dir:
         model_path = os.path.join(temp_dir, "model")
         mlflow.pyfunc.save_model(
-            model_path, python_model=DeepThought(), signature=signature
+            model_path, python_model=DeepThought(), signature=model_signature
         )
         yield mlflow.pyfunc.load_model(model_path)

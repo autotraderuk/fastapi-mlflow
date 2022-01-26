@@ -4,7 +4,7 @@
 Copyright (C) 2022, Auto Trader UK
 
 """
-from typing import Any, Callable
+from typing import Any, Callable, List
 
 from mlflow.pyfunc import PyFuncModel
 from pydantic import BaseModel
@@ -33,7 +33,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
         model.metadata.get_output_schema()
     )
 
-    async def predictor(request: request_type) -> return_type:
+    async def predictor(request: List[request_type]) -> List[return_type]:
         pass
 
     return predictor
