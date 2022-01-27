@@ -11,6 +11,7 @@ Copyright (C) 2022, Auto Trader UK
 
 """
 import os.path
+from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory
 
 import mlflow
@@ -32,7 +33,13 @@ class DeepThought(PythonModel):
 
 @pytest.fixture(scope="session")
 def model_input() -> pd.DataFrame:
-    return pd.DataFrame(dict(a=list(range(5)), b=list(range(5))))
+    a = [np.int64(i) for i in range(5)]
+    b = [np.double(i) for i in range(5)]
+    c = [np.bool_(i) for i in range(5)]
+    d = [bytes(i) for i in range(5)]
+    e = [str(i) for i in range(5)]
+    f = [datetime(2022, 1, 1) + timedelta(days=i) for i in range(5)]
+    return pd.DataFrame(dict(a=a, b=b, c=c, d=d, e=e, f=f))
 
 
 @pytest.fixture(scope="session")

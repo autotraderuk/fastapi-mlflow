@@ -26,5 +26,9 @@ def test_pyfunc_model_signature_inputs(pyfunc_model: PyFuncModel):
     schema_dict = schema.to_dict()
     assert schema_dict == [
         {"name": "a", "type": "long"},
-        {"name": "b", "type": "long"},
+        {"name": "b", "type": "double"},
+        {"name": "c", "type": "boolean"},
+        {"name": "d", "type": "binary"},
+        {"name": "e", "type": "string"},
+        {"name": "f", "type": "datetime"},
     ]

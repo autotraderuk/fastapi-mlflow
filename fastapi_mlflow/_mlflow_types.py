@@ -4,17 +4,25 @@
 Copyright (C) 2022, Auto Trader UK
 
 """
-from mlflow.types import Schema
-import pydantic
+from datetime import date, datetime
+from typing import Union
 
+import pydantic
+from mlflow.types import Schema
 
 MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP = {
-    "double": float,
-    "float64": float,
-    "int64": int,
+    "boolean": bool,
     "integer": int,
     "long": int,
+    "int32": int,
+    "int64": int,
+    "double": float,
+    "float": float,
+    "float32": float,
+    "float64": float,
     "string": str,
+    "binary": bytes,
+    "datetime": Union[datetime, date],
 }
 
 
