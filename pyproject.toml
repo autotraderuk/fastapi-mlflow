@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.8"
 mlflow = "^1.23.0"
 pydantic = "^1.9.0"
+fastapi = "^0.73.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
