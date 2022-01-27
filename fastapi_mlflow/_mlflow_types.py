@@ -38,9 +38,7 @@ def build_input_model(schema: Schema) -> pydantic.BaseModel:
 
 
 def build_output_model(schema: Schema):
-    rtype = MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP.get(
-        schema.numpy_types()[0].name
-    )
+    rtype = MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP.get(schema.numpy_types()[0].name)
     response_model = pydantic.create_model(
         "Response",
         prediction=(rtype, ...),  # ... because default value is unknown

@@ -5,7 +5,6 @@ Copyright (C) 2022, Auto Trader UK
 
 """
 from inspect import isawaitable, signature
-from itertools import zip_longest
 from typing import get_args, get_origin
 
 import numpy as np
@@ -27,7 +26,7 @@ def test_build_predictor_returns_coroutine_function(
     assert isawaitable(predictor(dummy_request))
 
 
-def test_coroutine_function_has_correct_signature_for_input(
+def test_predictor_has_correct_signature_for_input(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
 ):
@@ -38,12 +37,12 @@ def test_coroutine_function_has_correct_signature_for_input(
     request_type = sig.parameters["request"].annotation
     assert get_origin(request_type) is list
     assert issubclass(get_args(request_type)[0], pydantic.BaseModel), (
-        "type for items in predictor coroutine function parameter `request` is not a subclass of "
-        "pydantic.BaseModel"
+        "type for items in predictor coroutine function parameter `request` is not a"
+        "subclass of pydantic.BaseModel"
     )
 
 
-def test_coroutine_function_signature_items_can_be_constructed(
+def test_predictor_signature_items_can_be_constructed(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
 ):
@@ -63,7 +62,7 @@ def test_coroutine_function_signature_items_can_be_constructed(
         pydantic_request_model(foo="bar")
 
 
-def test_coroutine_function_signature_items_raise_validation_error_given_invalid_arguments(
+def test_predictor_signature_items_raise_validation_error_given_invalid_arguments(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
 ):
@@ -76,7 +75,7 @@ def test_coroutine_function_signature_items_raise_validation_error_given_invalid
         pydantic_request_model(foo="bar")
 
 
-def test_coroutine_function_has_correct_return_type(
+def test_predictor_has_correct_return_type(
     pyfunc_model: PyFuncModel,
 ):
     predictor = build_predictor(pyfunc_model)
@@ -85,13 +84,14 @@ def test_coroutine_function_has_correct_return_type(
     return_type = sig.return_annotation
     assert get_origin(return_type) is list
     pydantic_return_model = get_args(return_type)[0]
-    assert issubclass(
-        pydantic_return_model, pydantic.BaseModel
-    ), "type of items in return for predictor coroutine function is not a subclass of pydantic.BaseModel"
+    assert issubclass(pydantic_return_model, pydantic.BaseModel), (
+        "type of items in return for predictor coroutine function is not a subclass"
+        "of pydantic.BaseModel"
+    )
 
 
 @pytest.mark.asyncio
-async def test_coroutine_function_correctly_applies_model(
+async def test_predictor_correctly_applies_model(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
     model_output: np.array,
@@ -101,8 +101,7 @@ async def test_coroutine_function_correctly_applies_model(
     request_type = signature(predictor).parameters["request"].annotation
     pydantic_request_model = get_args(request_type)[0]
     request = [
-        pydantic_request_model(**row)
-        for row in model_input.to_dict(orient="record")
+        pydantic_request_model(**row) for row in model_input.to_dict(orient="record")
     ]
     response = await predictor(request)
     predictions = [item.prediction for item in response]

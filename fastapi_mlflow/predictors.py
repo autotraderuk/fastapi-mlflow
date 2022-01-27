@@ -27,18 +27,11 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
         predictor = build_predictor(model)
 
     """
-    request_type = _mlflow_types.build_input_model(
-        model.metadata.get_input_schema()
-    )
-    return_type = _mlflow_types.build_output_model(
-        model.metadata.get_output_schema()
-    )
+    request_type = _mlflow_types.build_input_model(model.metadata.get_input_schema())
+    return_type = _mlflow_types.build_output_model(model.metadata.get_output_schema())
 
     async def predictor(request: List[request_type]) -> List[return_type]:
         df = pd.DataFrame([row.dict() for row in request], dtype=object)
-        return [
-            return_type(prediction=row)
-            for row in model.predict(df)
-        ]
+        return [return_type(prediction=row) for row in model.predict(df)]
 
     return predictor

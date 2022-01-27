@@ -16,9 +16,7 @@ from fastapi_mlflow.applications import build_app
 def test_build_app_returns_an_application(pyfunc_model: PyFuncModel):
     app = build_app(pyfunc_model)
 
-    assert isinstance(
-        app, FastAPI
-    ), "build_app does not return a FastAPI instance"
+    assert isinstance(app, FastAPI), "build_app does not return a FastAPI instance"
 
 
 def test_build_app_provides_docs(pyfunc_model: PyFuncModel):
