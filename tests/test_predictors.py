@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Document test_predictors here.
+"""Test predictor function building.
 
 Copyright (C) 2022, Auto Trader UK
 
 """
-from inspect import isawaitable, signature
+from inspect import signature
 from typing import get_args, get_origin
 
 import numpy as np
@@ -16,14 +16,12 @@ from mlflow.pyfunc import PyFuncModel
 from fastapi_mlflow.predictors import build_predictor
 
 
-def test_build_predictor_returns_coroutine_function(
+def test_build_predictor_returns_callable(
     pyfunc_model: PyFuncModel,
 ):
     predictor = build_predictor(pyfunc_model)
 
     assert callable(predictor)
-    dummy_request = None
-    assert isawaitable(predictor(dummy_request))
 
 
 def test_predictor_has_correct_signature_for_input(
@@ -37,7 +35,7 @@ def test_predictor_has_correct_signature_for_input(
     request_type = sig.parameters["request"].annotation
     assert get_origin(request_type) is list
     assert issubclass(get_args(request_type)[0], pydantic.BaseModel), (
-        "type for items in predictor coroutine function parameter `request` is not a"
+        "type for items in predictor function parameter `request` is not a"
         "subclass of pydantic.BaseModel"
     )
 
@@ -55,7 +53,7 @@ def test_predictor_signature_items_can_be_constructed(
         pydantic_request_model(**model_input.to_dict(orient="records")[0]),
         pydantic_request_model,
     ), (
-        "type for items in predictor coroutine function parameter `request` cannot be "
+        "type for items in predictor function parameter `request` cannot be "
         "constructed with expected input data"
     )
     with pytest.raises(pydantic.ValidationError):
@@ -85,13 +83,12 @@ def test_predictor_has_correct_return_type(
     assert get_origin(return_type) is list
     pydantic_return_model = get_args(return_type)[0]
     assert issubclass(pydantic_return_model, pydantic.BaseModel), (
-        "type of items in return for predictor coroutine function is not a subclass"
-        "of pydantic.BaseModel"
+        "type of items in return for predictor function is not a subclass of"
+        "pydantic.BaseModel"
     )
 
 
-@pytest.mark.asyncio
-async def test_predictor_correctly_applies_model(
+def test_predictor_correctly_applies_model(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
     model_output: np.array,
@@ -103,6 +100,6 @@ async def test_predictor_correctly_applies_model(
     request = [
         pydantic_request_model(**row) for row in model_input.to_dict(orient="record")
     ]
-    response = await predictor(request)
+    response = predictor(request)
     predictions = [item.prediction for item in response]
     assert predictions == model_output.tolist()
