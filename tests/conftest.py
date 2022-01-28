@@ -14,12 +14,18 @@ import os.path
 from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory
 
-import mlflow
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import pytest
-from mlflow.models import ModelSignature, infer_signature
-from mlflow.pyfunc import PyFuncModel, PythonModel, PythonModelContext
+from mlflow.models import ModelSignature, infer_signature  # type: ignore
+from mlflow.pyfunc import (  # type: ignore
+    PyFuncModel,
+    PythonModel,
+    PythonModelContext,
+    load_model as pyfunc_load_model,
+    save_model as pyfunc_save_model,
+)
 
 
 class DeepThought(PythonModel):
@@ -27,7 +33,7 @@ class DeepThought(PythonModel):
 
     def predict(
         self, context: PythonModelContext, model_input: pd.DataFrame
-    ) -> np.array:
+    ) -> npt.ArrayLike:
         return np.array([42] * len(model_input))
 
 
@@ -43,13 +49,13 @@ def model_input() -> pd.DataFrame:
 
 
 @pytest.fixture(scope="session")
-def model_output(model_input: pd.DataFrame) -> np.array:
+def model_output(model_input: pd.DataFrame) -> npt.ArrayLike:
     return DeepThought().predict(context=None, model_input=model_input)
 
 
 @pytest.fixture(scope="session")
 def model_signature(
-    model_input: pd.DataFrame, model_output: np.array
+    model_input: pd.DataFrame, model_output: npt.ArrayLike
 ) -> ModelSignature:
     return infer_signature(
         model_input=model_input,
@@ -61,7 +67,7 @@ def model_signature(
 def pyfunc_model(model_signature: ModelSignature) -> PyFuncModel:
     with TemporaryDirectory() as temp_dir:
         model_path = os.path.join(temp_dir, "model")
-        mlflow.pyfunc.save_model(
+        pyfunc_save_model(
             model_path, python_model=DeepThought(), signature=model_signature
         )
-        yield mlflow.pyfunc.load_model(model_path)
+        yield pyfunc_load_model(model_path)

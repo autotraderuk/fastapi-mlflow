@@ -7,7 +7,7 @@ Copyright (C) 2022, Auto Trader UK
 from inspect import signature
 
 from fastapi import FastAPI
-from mlflow.pyfunc import PyFuncModel
+from mlflow.pyfunc import PyFuncModel  # type: ignore
 
 from fastapi_mlflow.predictors import build_predictor
 

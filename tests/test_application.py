@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from mlflow.pyfunc import PyFuncModel
+from mlflow.pyfunc import PyFuncModel  # type: ignore
 
 from fastapi_mlflow.applications import build_app
 
@@ -38,7 +38,7 @@ def test_build_app_has_predictions_endpoint(pyfunc_model: PyFuncModel):
 def test_build_app_returns_good_predictions(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
-    model_output: np.array,
+    model_output: np.typing.ArrayLike,
 ):
     app = build_app(pyfunc_model)
 
@@ -46,4 +46,6 @@ def test_build_app_returns_good_predictions(
     request_data = model_input.to_json(orient="records")
     response = client.post("/predictions", data=request_data)
     assert response.status_code == 200
-    assert response.json() == [{"prediction": v} for v in model_output]
+    assert response.json() == [
+        {"prediction": v} for v in np.nditer(model_output)
+    ]

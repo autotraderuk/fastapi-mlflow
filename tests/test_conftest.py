@@ -5,8 +5,9 @@ Copyright (C) 2022, Auto Trader UK
 
 """
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
-from mlflow.pyfunc import PyFuncModel
+from mlflow.pyfunc import PyFuncModel  # type: ignore
 
 
 def test_pyfunc_model_instance(pyfunc_model: PyFuncModel):
@@ -16,7 +17,7 @@ def test_pyfunc_model_instance(pyfunc_model: PyFuncModel):
 def test_pyfunc_model_predict(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
-    model_output: np.array,
+    model_output: npt.ArrayLike,
 ):
     assert np.equal(model_output, pyfunc_model.predict(model_input)).all()
 

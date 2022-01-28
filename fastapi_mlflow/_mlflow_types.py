@@ -8,7 +8,7 @@ from datetime import date, datetime
 from typing import Union
 
 import pydantic
-from mlflow.types import Schema
+from mlflow.types import Schema  # type: ignore
 
 MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP = {
     "boolean": bool,
@@ -34,7 +34,8 @@ def build_input_model(schema: Schema) -> pydantic.BaseModel:
         )
         for item in schema.to_dict()
     }
-    return pydantic.create_model("Request", **fields)
+    # Too dynamic for type checking!
+    return pydantic.create_model("Request", **fields)  # type: ignore
 
 
 def build_output_model(schema: Schema):

@@ -13,13 +13,13 @@ Copyright (C) 2022, Auto Trader UK
 from typing import Any, Callable, List
 
 import pandas as pd
-from mlflow.pyfunc import PyFuncModel
+from mlflow.pyfunc import PyFuncModel  # type: ignore
 from pydantic import BaseModel
 
 import fastapi_mlflow._mlflow_types as _mlflow_types
 
 
-def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
+def build_predictor(model: PyFuncModel) -> Callable[[List[BaseModel]], Any]:
     """Build and return a function that wraps the mlflow model.
 
     Currently supports only the `pyfunc`_ flavour of mlflow.
@@ -35,8 +35,12 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     .. _pyfunc: https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html
 
     """
-    request_type = _mlflow_types.build_input_model(model.metadata.get_input_schema())
-    return_type = _mlflow_types.build_output_model(model.metadata.get_output_schema())
+    request_type: Any = _mlflow_types.build_input_model(
+        model.metadata.get_input_schema()
+    )
+    return_type: Any = _mlflow_types.build_output_model(
+        model.metadata.get_output_schema()
+    )
 
     def predictor(request: List[request_type]) -> List[return_type]:
         df = pd.DataFrame([row.dict() for row in request], dtype=object)

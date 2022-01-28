@@ -10,13 +10,21 @@ python = "^3.8"
 mlflow = "^1.23.0"
 pydantic = "^1.9.0"
 fastapi = "^0.73.0"
+mypy = "^0.931"
 
 [tool.poetry.dev-dependencies]
 black = "^21.12b0"
 flake8-bugbear = "^22.1.11"
 isort = "^5.10.1"
 pytest = "^6.2.5"
+pandas = "^1.2.0"
+pandas-stubs = "^1.2.0"
+numpy = "^1.22.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.mypy]
+plugins = "numpy.typing.mypy_plugin"
