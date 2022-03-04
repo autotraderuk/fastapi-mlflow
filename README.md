@@ -1,6 +1,22 @@
 # fastapi mlflow
 
-Deploy mlflow models as JSON APIs using FastAPI with minimal new code.
+Deploy [mlflow](https://www.mlflow.org/) models as JSON APIs using [FastAPI](https://fastapi.tiangolo.com) with minimal new code.
+
+## Installation
+
+```shell
+pip install fastapi-mlflow
+```
+
+For running the app in production, you will also need an ASGI server, such as [Uvicorn](https://www.uvicorn.org) or [Hypercorn](https://gitlab.com/pgjones/hypercorn).
+
+## Examples
+
+### Simple
+
+#### Create
+
+Create a file `main.py` containing:
 
 ```python
 from fastapi_mlflow.applications import build_app
@@ -10,7 +26,23 @@ model = load_model("/Users/me/path/to/local/model")
 app = build_app(model)
 ```
 
-It should be possible to leverage [FastAPIs Sub Applications](https://fastapi.tiangolo.com/advanced/sub-applications/#sub-applications-mounts) to host multiple models (assuming that they have compatible dependencies...):
+#### Run
+
+Run the server with:
+
+```shell
+uvicorn main:app
+```
+
+#### Check
+
+Open your browser at <http://127.0.0.1:8000/docs>
+
+You should see the automatically generated docs for your model, and be able to test it out using the 
+
+### Serve multiple models
+
+It should be possible to host multiple models (assuming that they have compatible dependencies...) by leveraging [FastAPIs Sub Applications](https://fastapi.tiangolo.com/advanced/sub-applications/#sub-applications-mounts):
 
 ```python
 from fastapi import FastAPI
@@ -28,7 +60,11 @@ model2_app = build_app(model2)
 app.mount("/model2", model2_app)
 ```
 
-If you want more control over where and how the prediction is mounted, you can do that too:
+[Run](#run) and [Check](#check) as above.
+
+### Custom routing
+
+If you want more control over where and how the prediction end-point is mounted in your API, you can build the predictor function directly and use it as you need:
 
 ```python
 from inspect import signature
@@ -47,3 +83,5 @@ app.add_api_route(
     methods=["POST"],
 )
 ```
+
+[Run](#run) and [Check](#check) as above.
