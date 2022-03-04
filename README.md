@@ -10,6 +10,12 @@ pip install fastapi-mlflow
 
 For running the app in production, you will also need an ASGI server, such as [Uvicorn](https://www.uvicorn.org) or [Hypercorn](https://gitlab.com/pgjones/hypercorn).
 
+## License
+
+Copyright © 2022 Auto Trader Group plc.
+
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
 ## Examples
 
 ### Simple
