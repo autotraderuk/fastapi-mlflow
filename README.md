@@ -10,6 +10,15 @@ pip install fastapi-mlflow
 
 For running the app in production, you will also need an ASGI server, such as [Uvicorn](https://www.uvicorn.org) or [Hypercorn](https://gitlab.com/pgjones/hypercorn).
 
+## Install on Apple Silicon (ARM / M1)
+
+If you experience problems installing on a newer generation Apple silicon based device, [this solution from StackOverflow](https://stackoverflow.com/a/67586301) before retrying install has been found to help.
+
+```shell
+brew install openblas gfortran
+export OPENBLAS="$(brew --prefix openblas)"
+```
+
 ## License
 
 Copyright © 2022 Auto Trader Group plc.
