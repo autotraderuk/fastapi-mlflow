@@ -35,15 +35,16 @@ def build_predictor(model: PyFuncModel) -> Callable[[List[BaseModel]], Any]:
     .. _pyfunc: https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html
 
     """
-    request_type: Any = _mlflow_types.build_input_model(
-        model.metadata.get_input_schema()
-    )
-    return_type: Any = _mlflow_types.build_output_model(
-        model.metadata.get_output_schema()
-    )
+    # Some of the types here are too dynamic for type checking
 
-    def predictor(request: List[request_type]) -> List[return_type]:
-        df = pd.DataFrame([row.dict() for row in request], dtype=object)
-        return [return_type(prediction=row) for row in model.predict(df)]
+    class Request(BaseModel):
+        data: List[_mlflow_types.build_input_model(model.metadata.get_input_schema())]  # type: ignore
 
-    return predictor
+    class Response(BaseModel):
+        data: List[_mlflow_types.build_output_model(model.metadata.get_output_schema())]  # type: ignore
+
+    def predictor(request: Request) -> Response:
+        df = pd.DataFrame([row.dict() for row in request.data], dtype=object)
+        return Response(data=[{"prediction": row} for row in model.predict(df)])
+
+    return predictor  # type: ignore

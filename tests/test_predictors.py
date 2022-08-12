@@ -33,14 +33,18 @@ def test_predictor_has_correct_signature_for_input(
     sig = signature(predictor)
     assert "request" in sig.parameters
     request_type = sig.parameters["request"].annotation
-    assert get_origin(request_type) is list
-    assert issubclass(get_args(request_type)[0], pydantic.BaseModel), (
-        "type for items in predictor function parameter `request` is not a"
+    assert issubclass(request_type, pydantic.BaseModel), (
+        "type in predictor function parameter `request` is not a"
         "subclass of pydantic.BaseModel"
     )
+    schema = request_type.schema()
+    assert "data" in schema["required"]
+    assert schema["properties"]["data"]["type"] == "array"
+    assert "RequestRow" in schema["definitions"]
+    assert schema["definitions"]["RequestRow"]["required"] == list(model_input.columns)
 
 
-def test_predictor_signature_items_can_be_constructed(
+def test_predictor_signature_type_can_be_constructed(
     pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
 ):
@@ -48,16 +52,15 @@ def test_predictor_signature_items_can_be_constructed(
 
     sig = signature(predictor)
     request_type = sig.parameters["request"].annotation
-    pydantic_request_model = get_args(request_type)[0]
-    assert isinstance(
-        pydantic_request_model(**model_input.to_dict(orient="records")[0]),
-        pydantic_request_model,
-    ), (
-        "type for items in predictor function parameter `request` cannot be "
+
+    instance = request_type(data=model_input.to_dict(orient="records"))
+
+    assert isinstance(instance, request_type), (
+        "type predictor function parameter `request` cannot be "
         "constructed with expected input data"
     )
     with pytest.raises(pydantic.ValidationError):
-        pydantic_request_model(foo="bar")
+        request_type(foo="bar")
 
 
 def test_predictor_signature_items_raise_validation_error_given_invalid_arguments(
@@ -68,9 +71,8 @@ def test_predictor_signature_items_raise_validation_error_given_invalid_argument
 
     sig = signature(predictor)
     request_type = sig.parameters["request"].annotation
-    pydantic_request_model = get_args(request_type)[0]
     with pytest.raises(pydantic.ValidationError):
-        pydantic_request_model(foo="bar")
+        request_type(data=[{"foo": "bar"}])
 
 
 def test_predictor_has_correct_return_type(
@@ -80,12 +82,15 @@ def test_predictor_has_correct_return_type(
 
     sig = signature(predictor)
     return_type = sig.return_annotation
-    assert get_origin(return_type) is list
-    pydantic_return_model = get_args(return_type)[0]
-    assert issubclass(pydantic_return_model, pydantic.BaseModel), (
-        "type of items in return for predictor function is not a subclass of"
-        "pydantic.BaseModel"
+    assert issubclass(return_type, pydantic.BaseModel), (
+        "type in predictor function parameter `request` is not a"
+        "subclass of pydantic.BaseModel"
     )
+    schema = return_type.schema()
+    assert "data" in schema["required"]
+    assert schema["properties"]["data"]["type"] == "array"
+    assert "ResponseRow" in schema["definitions"]
+    assert schema["definitions"]["ResponseRow"]["required"] == ["prediction"]
 
 
 def test_predictor_correctly_applies_model(
@@ -96,11 +101,7 @@ def test_predictor_correctly_applies_model(
     predictor = build_predictor(pyfunc_model)
 
     request_type = signature(predictor).parameters["request"].annotation
-    pydantic_request_model = get_args(request_type)[0]
-    request = [
-        pydantic_request_model(**row)
-        for row in model_input.to_dict(orient="records")
-    ]
+    request = request_type(data=model_input.to_dict(orient="records"))
     response = predictor(request)
-    predictions = [item.prediction for item in response]
+    predictions = [item.prediction for item in response.data]
     assert predictions == model_output.tolist()  # type: ignore
