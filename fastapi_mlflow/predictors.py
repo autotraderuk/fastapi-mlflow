@@ -10,7 +10,7 @@ Current supports only the pyfunc flavour.
 Copyright (C) 2022, Auto Trader UK
 
 """
-from typing import Any, Callable, List
+from typing import Any, Callable, List, no_type_check
 
 import pandas as pd
 from mlflow.pyfunc import PyFuncModel  # type: ignore
@@ -19,7 +19,8 @@ from pydantic import BaseModel
 import fastapi_mlflow._mlflow_types as _mlflow_types
 
 
-def build_predictor(model: PyFuncModel) -> Callable[[List[BaseModel]], Any]:
+@no_type_check  # Some types here are too dynamic for type checking
+def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     """Build and return a function that wraps the mlflow model.
 
     Currently supports only the `pyfunc`_ flavour of mlflow.
@@ -35,16 +36,26 @@ def build_predictor(model: PyFuncModel) -> Callable[[List[BaseModel]], Any]:
     .. _pyfunc: https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html
 
     """
-    # Some of the types here are too dynamic for type checking
+    input_model = _mlflow_types.build_input_model(
+        model.metadata.get_input_schema()
+    )
+    output_model = _mlflow_types.build_output_model(
+        model.metadata.get_output_schema()
+    )
 
     class Request(BaseModel):
-        data: List[_mlflow_types.build_input_model(model.metadata.get_input_schema())]  # type: ignore
+        data: List[input_model]
 
     class Response(BaseModel):
-        data: List[_mlflow_types.build_output_model(model.metadata.get_output_schema())]  # type: ignore
+        data: List[output_model]
 
     def predictor(request: Request) -> Response:
         df = pd.DataFrame([row.dict() for row in request.data], dtype=object)
-        return Response(data=[{"prediction": row} for row in model.predict(df)])
+        results = model.predict(df)
+        try:
+            return Response(data=results.to_dict(orient="records"))
+        except (AttributeError, TypeError):
+            # Return type is probably a simple array-like
+            return Response(data=[{"prediction": row} for row in results])
 
     return predictor  # type: ignore

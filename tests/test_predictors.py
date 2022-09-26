@@ -5,7 +5,7 @@ Copyright (C) 2022, Auto Trader UK
 
 """
 from inspect import signature
-from typing import get_args, get_origin
+from typing import Union
 
 import numpy.typing as npt
 import pandas as pd
@@ -90,18 +90,31 @@ def test_predictor_has_correct_return_type(
     assert "data" in schema["required"]
     assert schema["properties"]["data"]["type"] == "array"
     assert "ResponseRow" in schema["definitions"]
-    assert schema["definitions"]["ResponseRow"]["required"] == ["prediction"]
 
 
+@pytest.mark.parametrize(
+    "pyfunc_output_type",
+    ["ndarray", "series", "dataframe"],
+)
 def test_predictor_correctly_applies_model(
-    pyfunc_model: PyFuncModel,
     model_input: pd.DataFrame,
-    model_output: npt.ArrayLike,
+    pyfunc_output_type: str,
+    request: pytest.FixtureRequest,
 ):
+    pyfunc_model: PyFuncModel = request.getfixturevalue(
+        f"pyfunc_model_{pyfunc_output_type}"
+    )
+    model_output: Union[npt.ArrayLike, pd.DataFrame] = request.getfixturevalue(
+        f"model_output_{pyfunc_output_type}"
+    )
+
     predictor = build_predictor(pyfunc_model)
 
     request_type = signature(predictor).parameters["request"].annotation
-    request = request_type(data=model_input.to_dict(orient="records"))
-    response = predictor(request)
-    predictions = [item.prediction for item in response.data]
-    assert predictions == model_output.tolist()  # type: ignore
+    request_obj = request_type(data=model_input.to_dict(orient="records"))
+    response = predictor(request_obj)
+    try:
+        assert response.data == model_output.to_dict(orient="records")  # type: ignore
+    except (AttributeError, TypeError):
+        predictions = [item.prediction for item in response.data]
+        assert predictions == model_output.tolist()  # type: ignore

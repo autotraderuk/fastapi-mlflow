@@ -10,7 +10,7 @@ from typing import Union
 import pydantic
 from mlflow.types import Schema  # type: ignore
 
-MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP = {
+MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
     "boolean": bool,
     "integer": int,
     "long": int,
@@ -27,21 +27,29 @@ MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP = {
 
 
 def build_input_model(schema: Schema) -> pydantic.BaseModel:
-    fields = {
-        item["name"]: (
-            MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP.get(item["type"]),
-            ...,  # ... because default value is unknown
-        )
-        for item in schema.to_dict()
-    }
-    # Too dynamic for type checking!
-    return pydantic.create_model("RequestRow", **fields)  # type: ignore
+    return pydantic.create_model(
+        "RequestRow", **(build_model_fields(schema))  # type: ignore
+    )
 
 
 def build_output_model(schema: Schema):
-    rtype = MLFLOW_SIGNATURE_TO_NUMPY_TYPE_MAP.get(schema.numpy_types()[0].name)
-    response_model = pydantic.create_model(
-        "ResponseRow",
-        prediction=(rtype, ...),  # ... because default value is unknown
-    )
-    return response_model
+    return pydantic.create_model("ResponseRow", **(build_model_fields(schema)))
+
+
+def build_model_fields(schema):
+    fields = {}
+    if schema.has_input_names():
+        fields.update(
+            {
+                item["name"]: (
+                    MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP.get(item["type"]),
+                    ...,  # ... because default value is unknown
+                )
+                for item in schema.to_dict()
+            }
+        )
+    else:
+        rtype = MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP.get(schema.numpy_types()[0].name)
+        fields["prediction"] = (rtype, ...)  # ... because default value is unknown
+
+    return fields
