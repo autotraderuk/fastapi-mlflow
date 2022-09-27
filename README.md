@@ -53,7 +53,7 @@ uvicorn main:app
 
 Open your browser at <http://127.0.0.1:8000/docs>
 
-You should see the automatically generated docs for your model, and be able to test it out using the 
+You should see the automatically generated docs for your model, and be able to test it out using the `Try it out` button in the UI.
 
 ### Serve multiple models
 
