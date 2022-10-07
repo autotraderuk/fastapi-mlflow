@@ -64,10 +64,11 @@ def test_pyfunc_model_signature_inputs(pyfunc_model_ndarray):
     schema = pyfunc_model_ndarray.metadata.get_input_schema()
     schema_dict = schema.to_dict()
     assert schema_dict == [
-        {"name": "a", "type": "long"},
-        {"name": "b", "type": "double"},
-        {"name": "c", "type": "boolean"},
-        {"name": "d", "type": "binary"},
-        {"name": "e", "type": "string"},
-        {"name": "f", "type": "datetime"},
+        {"name": "int32", "type": "integer"},
+        {"name": "int64", "type": "long"},
+        {"name": "double", "type": "double"},
+        {"name": "bool", "type": "boolean"},
+        {"name": "bytes", "type": "binary"},
+        {"name": "str", "type": "string"},
+        {"name": "datetime", "type": "datetime"},
     ]

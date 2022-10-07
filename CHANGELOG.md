@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Support for multiple model outputs by handling `PyFuncModel`s that return `pandas.Series` or `pandas.DataFrame`
 
+### Fixed
+- Explicitly cast DataFrame column types before applying model to handle downcast of 32-bit integers.
+
 ## [0.2.0] - 2022-08-12
 ### Changed
 - Return an object in JSON APIs, rather than arrays of objects. This provides better interoperability with JVM based clients using the popular Jackson object mapper.

@@ -68,13 +68,24 @@ class DeepThoughtDataframe(PythonModel):
 
 @pytest.fixture(scope="session")
 def model_input() -> pd.DataFrame:
-    a = [np.int64(i) for i in range(5)]
-    b = [np.double(i) for i in range(5)]
-    c = [np.bool_(i) for i in range(5)]
-    d = [bytes(i) for i in range(5)]
-    e = [str(i) for i in range(5)]
-    f = [datetime(2022, 1, 1) + timedelta(days=i) for i in range(5)]
-    return pd.DataFrame(dict(a=a, b=b, c=c, d=d, e=e, f=f))
+    int32_ = [np.int32(i) for i in range(5)]
+    int64_ = [np.int64(i) for i in range(5)]
+    double_ = [np.double(i) for i in range(5)]
+    bool_ = [np.bool_(i) for i in range(5)]
+    bytes_ = [bytes(i) for i in range(5)]
+    str_ = [str(i) for i in range(5)]
+    datetime_ = [datetime(2022, 1, 1) + timedelta(days=i) for i in range(5)]
+    return pd.DataFrame(
+        dict(
+            int32=int32_,
+            int64=int64_,
+            double=double_,
+            bool=bool_,
+            bytes=bytes_,
+            str=str_,
+            datetime=datetime_,
+        )
+    )
 
 
 # Model with ndarray output

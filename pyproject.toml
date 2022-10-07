@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-mlflow"
-version = "0.2.0"
+version = "0.3.0rc2"
 description = "Deploy mlflow models as JSON APIs with minimal new code."
 authors = ["John Harrison <john.harrison@autotrader.co.uk>"]
 readme = "README.md"
