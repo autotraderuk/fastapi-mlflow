@@ -7,7 +7,6 @@ Copyright (C) 2022, Auto Trader UK
 from datetime import date, datetime
 from typing import Union
 
-import pydantic
 from mlflow.types import Schema  # type: ignore
 
 MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
@@ -24,16 +23,6 @@ MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
     "binary": bytes,
     "datetime": Union[datetime, date],
 }
-
-
-def build_input_model(schema: Schema) -> pydantic.BaseModel:
-    return pydantic.create_model(
-        "RequestRow", **(build_model_fields(schema))  # type: ignore
-    )
-
-
-def build_output_model(schema: Schema):
-    return pydantic.create_model("ResponseRow", **(build_model_fields(schema)))
 
 
 def build_model_fields(schema):

@@ -14,9 +14,9 @@ from typing import Any, Callable, List, no_type_check
 
 import pandas as pd
 from mlflow.pyfunc import PyFuncModel  # type: ignore
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
 
-import fastapi_mlflow._mlflow_types as _mlflow_types
+from fastapi_mlflow._mlflow_types import build_model_fields
 
 
 @no_type_check  # Some types here are too dynamic for type checking
@@ -36,11 +36,11 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     .. _pyfunc: https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html
 
     """
-    input_model = _mlflow_types.build_input_model(
-        model.metadata.get_input_schema()
+    input_model = create_model(
+        "RequestRow", **(build_model_fields(model.metadata.get_input_schema()))
     )
-    output_model = _mlflow_types.build_output_model(
-        model.metadata.get_output_schema()
+    output_model = create_model(
+        "ResponseRow", **(build_model_fields(model.metadata.get_output_schema()))
     )
 
     class Request(BaseModel):
