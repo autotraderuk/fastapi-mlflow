@@ -19,13 +19,9 @@ import numpy.typing as npt
 import pandas as pd
 import pytest
 from mlflow.models import infer_signature  # type: ignore
-from mlflow.pyfunc import (  # type: ignore
-    PyFuncModel,
-    PythonModel,
-    PythonModelContext,
-    load_model as pyfunc_load_model,
-    save_model as pyfunc_save_model,
-)
+from mlflow.pyfunc import PyFuncModel, PythonModel, PythonModelContext
+from mlflow.pyfunc import load_model as pyfunc_load_model  # type: ignore
+from mlflow.pyfunc import save_model as pyfunc_save_model
 
 
 class DeepThought(PythonModel):
@@ -64,6 +60,19 @@ class DeepThoughtDataframe(PythonModel):
             ]
             * len(model_input)
         )
+
+
+class NaNModel(PythonModel):
+    """A PythonModel that returns NaN."""
+
+    def predict(self, context: PythonModelContext, model_input: pd.DataFrame):
+        return np.array([np.nan] * len(model_input))
+
+class NaNModelSeries(PythonModel):
+    """A PythonModel that returns NaN."""
+
+    def predict(self, context: PythonModelContext, model_input: pd.DataFrame):
+        return pd.Series([np.nan] * len(model_input))
 
 
 @pytest.fixture(scope="session")
@@ -193,7 +202,73 @@ def pyfunc_model_dataframe(
         yield pyfunc_load_model(model_path)
 
 
-@pytest.fixture(params=["ndarray", "series", "dataframe"])
+# Model with ndarray output of NaNs
+
+
+@pytest.fixture(scope="session")
+def python_model_nan_ndarray() -> PythonModel:
+    return NaNModel()
+
+
+@pytest.fixture(scope="session")
+def model_output_nan_ndarray(
+        python_model_nan_ndarray, model_input: pd.DataFrame
+) -> npt.ArrayLike:
+    return python_model_nan_ndarray.predict(context=None, model_input=model_input)
+
+
+@pytest.fixture(scope="session")
+def pyfunc_model_nan_ndarray(
+        python_model_nan_ndarray,
+    model_input: pd.DataFrame,
+    model_output_ndarray: npt.ArrayLike,  # Use to infer correct
+) -> PyFuncModel:
+    signature = infer_signature(
+        model_input=model_input,
+        model_output=model_output_ndarray,
+    )
+    with TemporaryDirectory() as temp_dir:
+        model_path = os.path.join(temp_dir, "model_nan_ndarray")
+        pyfunc_save_model(
+            model_path,
+            python_model=python_model_nan_ndarray,
+            signature=signature,
+        )
+        yield pyfunc_load_model(model_path)
+
+@pytest.fixture(scope="session")
+def python_model_nan_series() -> PythonModel:
+    return NaNModelSeries()
+
+
+@pytest.fixture(scope="session")
+def model_output_nan_series(
+        python_model_nan_series, model_input: pd.DataFrame
+) -> npt.ArrayLike:
+    return python_model_nan_series.predict(context=None, model_input=model_input)
+
+
+@pytest.fixture(scope="session")
+def pyfunc_model_nan_series(
+        python_model_nan_series,
+    model_input: pd.DataFrame,
+    model_output_series: pd.Series,  # Use to infer correct
+) -> PyFuncModel:
+    signature = infer_signature(
+        model_input=model_input,
+        model_output=model_output_series,
+    )
+    with TemporaryDirectory() as temp_dir:
+        model_path = os.path.join(temp_dir, "model_nan_series")
+        pyfunc_save_model(
+            model_path,
+            python_model=python_model_nan_series,
+            signature=signature,
+        )
+        yield pyfunc_load_model(model_path)
+
+
+@pytest.fixture(params=["ndarray", "series", "dataframe", "nan_ndarray", "nan_series"])
 def pyfunc_model(request: pytest.FixtureRequest) -> PyFuncModel:
     return request.getfixturevalue(f"pyfunc_model_{request.param}")  # type: ignore
     # param is an optional attribute, and may not be present when type checking

@@ -6,8 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+### Fixed
 - Assume that prediction output field(s) may be nullable. It's not uncommon to want ML models to return null or nan values at inference time (e.g. extrapolation outside of training data range).
+- Coerce nan values in ndarray output to null in JSON
 
 ## [0.3.0] - 2022-10-07
 ### Added

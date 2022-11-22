@@ -70,9 +70,15 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     def predictor(request: Request) -> Response:
         results = model.predict(request_to_dataframe(request))
         try:
-            return Response(data=results.to_dict(orient="records"))
+            response_data = results.to_dict(orient="records")
         except (AttributeError, TypeError):
             # Return type is probably a simple array-like
-            return Response(data=[{"prediction": row} for row in results])
+            # Replace NaN with None
+            response_data = []
+            for row in results:
+                value = row if not np.isnan(row) else None
+                response_data.append({"prediction": value})
+
+        return Response(data=response_data)
 
     return predictor  # type: ignore

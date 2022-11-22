@@ -60,6 +60,21 @@ class TestDataFramePyFuncModel:
         )
 
 
+class TestNDArrayNaNPyFuncModel:
+    def test_pyfunc_model_ndarray_nan_instance(
+        self, pyfunc_model_nan_ndarray
+    ):
+        assert isinstance(pyfunc_model_nan_ndarray, PyFuncModel)
+
+    def test_pyfunc_model_ndarray_nan_predict(
+        self,
+            pyfunc_model_nan_ndarray,
+        model_input: pd.DataFrame,
+    ):
+        """PyFunc model with ndarray return type should predict correct values."""
+        assert np.isnan(pyfunc_model_nan_ndarray.predict(model_input)).all()
+
+
 def test_pyfunc_model_signature_inputs(pyfunc_model_ndarray):
     schema = pyfunc_model_ndarray.metadata.get_input_schema()
     schema_dict = schema.to_dict()

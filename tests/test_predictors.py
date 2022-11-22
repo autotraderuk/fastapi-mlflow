@@ -118,3 +118,25 @@ def test_predictor_correctly_applies_model(
     except (AttributeError, TypeError):
         predictions = [item.prediction for item in response.data]
         assert predictions == model_output.tolist()  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "pyfunc_output_type",
+    ["ndarray", "series"],
+)
+def test_predictor_handles_model_returning_nan(
+    model_input: pd.DataFrame,
+    pyfunc_output_type: str,
+    request: pytest.FixtureRequest,
+):
+    pyfunc_model: PyFuncModel = request.getfixturevalue(
+        f"pyfunc_model_nan_{pyfunc_output_type}"
+    )
+
+    predictor = build_predictor(pyfunc_model)
+
+    request_type = signature(predictor).parameters["request"].annotation
+    request_obj = request_type(data=model_input.to_dict(orient="records"))
+    response = predictor(request_obj)
+    predictions = [item.prediction for item in response.data]
+    assert predictions == [None] * len(model_input)
