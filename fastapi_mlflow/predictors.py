@@ -43,7 +43,8 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     input_schema = model.metadata.get_input_schema()
     input_model = create_model("RequestRow", **(build_model_fields(input_schema)))
     output_model = create_model(
-        "ResponseRow", **(build_model_fields(model.metadata.get_output_schema()))
+        "ResponseRow",
+        **(build_model_fields(model.metadata.get_output_schema(), nullable=True))
     )
 
     class Request(BaseModel):
