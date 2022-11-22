@@ -70,7 +70,11 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     def predictor(request: Request) -> Response:
         results = model.predict(request_to_dataframe(request))
         try:
-            response_data = results.to_dict(orient="records")
+            response_data = (
+                results.fillna(np.nan)
+                .replace([np.nan], [None])
+                .to_dict(orient="records")
+            )
         except (AttributeError, TypeError):
             # Return type is probably a simple array-like
             # Replace NaN with None

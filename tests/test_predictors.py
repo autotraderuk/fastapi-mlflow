@@ -122,7 +122,7 @@ def test_predictor_correctly_applies_model(
 
 @pytest.mark.parametrize(
     "pyfunc_output_type",
-    ["ndarray", "series"],
+    ["ndarray", "series", "dataframe"],
 )
 def test_predictor_handles_model_returning_nan(
     model_input: pd.DataFrame,
@@ -138,5 +138,9 @@ def test_predictor_handles_model_returning_nan(
     request_type = signature(predictor).parameters["request"].annotation
     request_obj = request_type(data=model_input.to_dict(orient="records"))
     response = predictor(request_obj)
-    predictions = [item.prediction for item in response.data]
-    assert predictions == [None] * len(model_input)
+    for item in response.data:
+        if pyfunc_output_type in ("ndarray", "series"):
+            assert item.prediction is None
+        else:
+            assert item.a is None
+            assert item.b is None

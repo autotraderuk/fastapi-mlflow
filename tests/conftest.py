@@ -68,11 +68,29 @@ class NaNModel(PythonModel):
     def predict(self, context: PythonModelContext, model_input: pd.DataFrame):
         return np.array([np.nan] * len(model_input))
 
-class NaNModelSeries(PythonModel):
-    """A PythonModel that returns NaN."""
 
-    def predict(self, context: PythonModelContext, model_input: pd.DataFrame):
-        return pd.Series([np.nan] * len(model_input))
+class NaNModelSeries(PythonModel):
+    """A PythonModel that returns NaNs in a Series."""
+
+    def predict(
+        self, context: PythonModelContext, model_input: pd.DataFrame
+    ) -> pd.Series:
+        return pd.Series(NaNModel().predict(context, model_input))
+
+
+class NaNModelDataFrame(PythonModel):
+    """A PythonModel that returns NaNs in a DataFrame."""
+
+    def predict(
+        self, context: PythonModelContext, model_input: pd.DataFrame
+    ) -> pd.DataFrame:
+        nan_model = NaNModelSeries()
+        return pd.DataFrame(
+            {
+                "a": nan_model.predict(context, model_input),
+                "b": nan_model.predict(context, model_input),
+            }
+        )
 
 
 @pytest.fixture(scope="session")
@@ -219,7 +237,7 @@ def model_output_nan_ndarray(
 
 @pytest.fixture(scope="session")
 def pyfunc_model_nan_ndarray(
-        python_model_nan_ndarray,
+    python_model_nan_ndarray: PythonModel,
     model_input: pd.DataFrame,
     model_output_ndarray: npt.ArrayLike,  # Use to infer correct
 ) -> PyFuncModel:
@@ -236,6 +254,7 @@ def pyfunc_model_nan_ndarray(
         )
         yield pyfunc_load_model(model_path)
 
+
 @pytest.fixture(scope="session")
 def python_model_nan_series() -> PythonModel:
     return NaNModelSeries()
@@ -244,13 +263,13 @@ def python_model_nan_series() -> PythonModel:
 @pytest.fixture(scope="session")
 def model_output_nan_series(
         python_model_nan_series, model_input: pd.DataFrame
-) -> npt.ArrayLike:
+) -> pd.Series:
     return python_model_nan_series.predict(context=None, model_input=model_input)
 
 
 @pytest.fixture(scope="session")
 def pyfunc_model_nan_series(
-        python_model_nan_series,
+    python_model_nan_series: PythonModel,
     model_input: pd.DataFrame,
     model_output_series: pd.Series,  # Use to infer correct
 ) -> PyFuncModel:
@@ -268,7 +287,48 @@ def pyfunc_model_nan_series(
         yield pyfunc_load_model(model_path)
 
 
-@pytest.fixture(params=["ndarray", "series", "dataframe", "nan_ndarray", "nan_series"])
+@pytest.fixture(scope="session")
+def python_model_nan_dataframe() -> PythonModel:
+    return NaNModelDataFrame()
+
+
+@pytest.fixture(scope="session")
+def model_output_nan_dataframe(
+    python_model_nan_dataframe, model_input: pd.DataFrame
+) -> pd.DataFrame:
+    return python_model_nan_dataframe.predict(context=None, model_input=model_input)
+
+
+@pytest.fixture(scope="session")
+def pyfunc_model_nan_dataframe(
+    python_model_nan_dataframe: PythonModel,
+    model_input: pd.DataFrame,
+    model_output_nan_dataframe: pd.DataFrame,  # Use to infer correct
+) -> PyFuncModel:
+    signature = infer_signature(
+        model_input=model_input,
+        model_output=model_output_nan_dataframe,
+    )
+    with TemporaryDirectory() as temp_dir:
+        model_path = os.path.join(temp_dir, "model_nan_dataframe")
+        pyfunc_save_model(
+            model_path,
+            python_model=python_model_nan_dataframe,
+            signature=signature,
+        )
+        yield pyfunc_load_model(model_path)
+
+
+@pytest.fixture(
+    params=[
+        "ndarray",
+        "series",
+        "dataframe",
+        "nan_ndarray",
+        "nan_series",
+        "nan_dataframe",
+    ]
+)
 def pyfunc_model(request: pytest.FixtureRequest) -> PyFuncModel:
     return request.getfixturevalue(f"pyfunc_model_{request.param}")  # type: ignore
     # param is an optional attribute, and may not be present when type checking
