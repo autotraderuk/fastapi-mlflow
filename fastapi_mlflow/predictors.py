@@ -80,7 +80,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
             # Replace NaN with None
             response_data = []
             for row in results:
-                value = row if not np.isnan(row) else None
+                value = row if type(row) == "str" or not np.isnan(row) else None
                 response_data.append({"prediction": value})
 
         return Response(data=response_data)
