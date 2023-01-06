@@ -10,9 +10,10 @@ Current supports only the pyfunc flavour.
 Copyright (C) 2022, Auto Trader UK
 
 """
-from typing import Any, Callable, List, no_type_check
+from typing import Any, Callable, List, no_type_check, Union, Dict
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 from pydantic import BaseModel, create_model
@@ -68,21 +69,24 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
         return df
 
     def predictor(request: Request) -> Response:
-        results = model.predict(request_to_dataframe(request))
-        try:
-            response_data = (
-                results.fillna(np.nan)
-                .replace([np.nan], [None])
-                .to_dict(orient="records")
-            )
-        except (AttributeError, TypeError):
-            # Return type is probably a simple array-like
-            # Replace NaN with None
-            response_data = []
-            for row in results:
-                value = row if not np.isnan(row) else None
-                response_data.append({"prediction": value})
-
+        predictions = model.predict(request_to_dataframe(request))
+        response_data = convert_predictions_to_python(predictions)
         return Response(data=response_data)
 
     return predictor  # type: ignore
+
+
+def convert_predictions_to_python(results) -> List[Dict[str, Any]]:
+    """Convert and return predictions in native Python types."""
+    try:
+        response_data = (
+            results.fillna(np.nan).replace([np.nan], [None]).to_dict(orient="records")
+        )
+    except (AttributeError, TypeError):
+        # Return type is probably a simple array-like
+        # Replace NaN with None
+        response_data = []
+        for row in results:
+            value = row if not np.isnan(row) else None
+            response_data.append({"prediction": value})
+    return response_data

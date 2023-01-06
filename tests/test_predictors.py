@@ -7,13 +7,14 @@ Copyright (C) 2022, Auto Trader UK
 from inspect import signature
 from typing import Union
 
+import numpy as np
 import numpy.typing as npt
 import pandas as pd
 import pydantic
 import pytest
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 
-from fastapi_mlflow.predictors import build_predictor
+from fastapi_mlflow.predictors import build_predictor, convert_predictions_to_python
 
 
 def test_build_predictor_returns_callable(
@@ -144,3 +145,38 @@ def test_predictor_handles_model_returning_nan(
         else:
             assert item.a is None
             assert item.b is None
+
+
+def test_convert_predictions_to_python_ndarray():
+    predictions = np.array([1, 2, 3, np.nan])
+    response_data = convert_predictions_to_python(predictions)
+    assert [
+        {"prediction": 1},
+        {"prediction": 2},
+        {"prediction": 3},
+        {"prediction": None},
+    ] == response_data
+
+
+def test_convert_predictions_to_python_series():
+    predictions = pd.Series([1, 2, 3, np.nan])
+    response_data = convert_predictions_to_python(predictions)
+    assert [
+        {"prediction": 1},
+        {"prediction": 2},
+        {"prediction": 3},
+        {"prediction": None},
+    ] == response_data
+
+
+def test_convert_predictions_to_python_dataframe():
+    predictions = pd.DataFrame(
+        {"expected": [1, 2, 3, np.nan], "confidence": [0.0, 0.5, 1.0, None]}
+    )
+    response_data = convert_predictions_to_python(predictions)
+    assert [
+        {"expected": 1, "confidence": 0.0},
+        {"expected": 2, "confidence": 0.5},
+        {"expected": 3, "confidence": 1.0},
+        {"expected": None, "confidence": None},
+    ] == response_data
