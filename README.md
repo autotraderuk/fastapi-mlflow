@@ -21,7 +21,7 @@ export OPENBLAS="$(brew --prefix openblas)"
 
 ## License
 
-Copyright © 2022 Auto Trader Group plc.
+Copyright © 2022-23 Auto Trader Group plc.
 
 [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
 

@@ -35,7 +35,7 @@ def test_build_app_has_predictions_endpoint(pyfunc_model: PyFuncModel):
     app = build_app(pyfunc_model)
 
     client = TestClient(app)
-    response = client.post("/predictions", {})
+    response = client.post("/predictions", data={})
     assert response.status_code != 404
 
 
