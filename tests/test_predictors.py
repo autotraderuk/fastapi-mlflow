@@ -158,6 +158,16 @@ def test_convert_predictions_to_python_ndarray():
     ] == response_data
 
 
+def test_convert_predictions_to_python_ndarray_strings():
+    predictions = np.array(["foo", "bar", None])
+    response_data = convert_predictions_to_python(predictions)
+    assert [
+        {"prediction": "foo"},
+        {"prediction": "bar"},
+        {"prediction": None},
+    ] == response_data
+
+
 def test_convert_predictions_to_python_series():
     predictions = pd.Series([1, 2, 3, np.nan])
     response_data = convert_predictions_to_python(predictions)
