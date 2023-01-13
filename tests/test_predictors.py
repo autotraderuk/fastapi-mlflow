@@ -4,6 +4,7 @@
 Copyright (C) 2022, Auto Trader UK
 
 """
+from datetime import datetime
 from inspect import signature
 from typing import Union
 
@@ -164,6 +165,15 @@ def test_convert_predictions_to_python_ndarray_strings():
     assert [
         {"prediction": "foo"},
         {"prediction": "bar"},
+        {"prediction": None},
+    ] == response_data
+
+
+def test_convert_predictions_to_python_ndarray_datetimes():
+    predictions = np.array([datetime(2023, 1, 1), None])
+    response_data = convert_predictions_to_python(predictions)
+    assert [
+        {"prediction": datetime(2023, 1, 1)},
         {"prediction": None},
     ] == response_data
 
