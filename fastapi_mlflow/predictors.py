@@ -87,6 +87,6 @@ def convert_predictions_to_python(results) -> List[Dict[str, Any]]:
         # Replace NaN with None
         response_data = []
         for row in results:
-            value = row if not np.isnan(row) else None
+            value = row if not pd.isnull(row) else None
             response_data.append({"prediction": value})
     return response_data
