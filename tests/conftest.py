@@ -93,6 +93,13 @@ class NaNModelDataFrame(PythonModel):
         )
 
 
+class ExceptionRaiser(PythonModel):
+    def predict(
+        self, context: PythonModelContext, model_input: pd.DataFrame
+    ) -> pd.DataFrame:
+        raise ValueError("I always raise an error!")
+
+
 @pytest.fixture(scope="session")
 def model_input() -> pd.DataFrame:
     int32_ = [np.int32(i) for i in range(5)]
@@ -314,6 +321,32 @@ def pyfunc_model_nan_dataframe(
         pyfunc_save_model(
             model_path,
             python_model=python_model_nan_dataframe,
+            signature=signature,
+        )
+        yield pyfunc_load_model(model_path)
+
+
+# Model that always raises exceptions
+@pytest.fixture(scope="session")
+def python_model_value_error() -> PythonModel:
+    return ExceptionRaiser()
+
+
+@pytest.fixture(scope="session")
+def pyfunc_model_value_error(
+    python_model_value_error,
+    model_input: pd.DataFrame,
+    model_output_series: pd.Series,  # Use to infer correct
+) -> PyFuncModel:
+    signature = infer_signature(
+        model_input=model_input,
+        model_output=model_output_series,
+    )
+    with TemporaryDirectory() as temp_dir:
+        model_path = os.path.join(temp_dir, "model_exceptions")
+        pyfunc_save_model(
+            model_path,
+            python_model=python_model_value_error,
             signature=signature,
         )
         yield pyfunc_load_model(model_path)

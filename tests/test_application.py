@@ -56,7 +56,6 @@ def test_build_app_returns_good_predictions(
     )
 
     app = build_app(pyfunc_model)
-
     client = TestClient(app)
     df_str = model_input.to_json(orient="records")
     request_data = f'{{"data": {df_str}}}'
@@ -71,3 +70,20 @@ def test_build_app_returns_good_predictions(
         assert [
             {"prediction": v} for v in np.nditer(model_output)
         ] == results  # type: ignore
+
+
+def test_built_application_handles_model_exceptions(
+    model_input: pd.DataFrame, pyfunc_model_value_error: PyFuncModel
+):
+    app = build_app(pyfunc_model_value_error)
+    client = TestClient(app, raise_server_exceptions=False)
+    df_str = model_input.to_json(orient="records")
+    request_data = f'{{"data": {df_str}}}'
+
+    response = client.post("/predictions", json=request_data)
+
+    assert response.status_code == 500
+    assert {
+        "name": "ValueError",
+        "message": "I always raise an error!",
+    } == response.json()

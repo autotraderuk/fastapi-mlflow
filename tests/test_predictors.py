@@ -15,7 +15,11 @@ import pydantic
 import pytest
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 
-from fastapi_mlflow.predictors import build_predictor, convert_predictions_to_python
+from fastapi_mlflow.predictors import (
+    build_predictor,
+    convert_predictions_to_python,
+    PyFuncModelPredictError,
+)
 
 
 def test_build_predictor_returns_callable(
@@ -146,6 +150,18 @@ def test_predictor_handles_model_returning_nan(
         else:
             assert item.a is None
             assert item.b is None
+
+
+def test_predictor_exception_from_model_raised_from(
+    model_input: pd.DataFrame, pyfunc_model_value_error: PyFuncModel
+):
+    predictor = build_predictor(pyfunc_model_value_error)
+
+    request_type = signature(predictor).parameters["request"].annotation
+    request_obj = request_type(data=model_input.to_dict(orient="records"))
+
+    with pytest.raises(PyFuncModelPredictError):
+        predictor(request_obj)
 
 
 def test_convert_predictions_to_python_ndarray():
