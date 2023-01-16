@@ -19,7 +19,7 @@ import numpy.typing as npt
 import pandas as pd
 import pytest
 from mlflow.models import infer_signature  # type: ignore
-from mlflow.pyfunc import PyFuncModel, PythonModel, PythonModelContext
+from mlflow.pyfunc import PyFuncModel, PythonModel, PythonModelContext  # type: ignore
 from mlflow.pyfunc import load_model as pyfunc_load_model  # type: ignore
 from mlflow.pyfunc import save_model as pyfunc_save_model
 

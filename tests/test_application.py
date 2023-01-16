@@ -60,7 +60,9 @@ def test_build_app_returns_good_predictions(
     client = TestClient(app)
     df_str = model_input.to_json(orient="records")
     request_data = f'{{"data": {df_str}}}'
-    response = client.post("/predictions", data=request_data)
+
+    response = client.post("/predictions", json=request_data)
+
     assert response.status_code == 200
     results = response.json()["data"]
     try:
