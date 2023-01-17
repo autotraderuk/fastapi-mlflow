@@ -7,8 +7,6 @@ Copyright (C) 2022, Auto Trader UK
 from datetime import date, datetime
 from typing import Dict, Optional, Union
 
-from mlflow.types import Schema  # type: ignore
-
 MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
     "boolean": bool,
     "integer": int,
