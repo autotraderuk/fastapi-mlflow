@@ -60,7 +60,7 @@ def test_build_app_returns_good_predictions(
     df_str = model_input.to_json(orient="records")
     request_data = f'{{"data": {df_str}}}'
 
-    response = client.post("/predictions", json=request_data)
+    response = client.post("/predictions", content=request_data)
 
     assert response.status_code == 200
     results = response.json()["data"]
@@ -80,7 +80,7 @@ def test_built_application_handles_model_exceptions(
     df_str = model_input.to_json(orient="records")
     request_data = f'{{"data": {df_str}}}'
 
-    response = client.post("/predictions", json=request_data)
+    response = client.post("/predictions", content=request_data)
 
     assert response.status_code == 500
     assert {
