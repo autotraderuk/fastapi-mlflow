@@ -8,7 +8,6 @@ Created 21. Nov 2022
 from typing import Optional
 
 import pytest
-from mlflow.pyfunc import PyFuncModel
 from mlflow.types.schema import Schema, ColSpec, DataType
 from fastapi_mlflow._mlflow_types import build_model_fields
 

@@ -10,10 +10,9 @@ Current supports only the pyfunc flavour.
 Copyright (C) 2022, Auto Trader UK
 
 """
-from typing import Any, Callable, List, no_type_check, Union, Dict
+from typing import Any, Callable, List, no_type_check, Dict
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 from pydantic import BaseModel, create_model
