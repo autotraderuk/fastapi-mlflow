@@ -66,7 +66,7 @@ class TestNaNNDArrayPyFuncModel:
 
     def test_pyfunc_model_nan_ndarray_predict(
         self,
-            pyfunc_model_nan_ndarray,
+        pyfunc_model_nan_ndarray,
         model_input: pd.DataFrame,
     ):
         """PyFunc model with ndarray return type should predict correct values."""

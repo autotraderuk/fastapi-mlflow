@@ -6,10 +6,14 @@ Copyright (C) 2022, Auto Trader UK
 """
 from inspect import signature
 
-from fastapi import FastAPI
-from mlflow.pyfunc import PyFuncModel  # type: ignore
+from fastapi import (
+    FastAPI,
+    Request,
+)
+from fastapi.responses import JSONResponse
 
-from fastapi_mlflow.predictors import build_predictor
+from mlflow.pyfunc import PyFuncModel  # type: ignore
+from fastapi_mlflow.predictors import build_predictor, PyFuncModelPredictError
 
 
 def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
@@ -23,4 +27,12 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
         response_model=response_model,
         methods=["POST"],
     )
+
+    @app.exception_handler(Exception)
+    def handle_exception(_: Request, exc: PyFuncModelPredictError):
+        return JSONResponse(
+            status_code=500,
+            content=exc.to_dict(),
+        )
+
     return app

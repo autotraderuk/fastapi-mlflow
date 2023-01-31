@@ -10,10 +10,9 @@ Current supports only the pyfunc flavour.
 Copyright (C) 2022, Auto Trader UK
 
 """
-from typing import Any, Callable, List, no_type_check, Union, Dict
+from typing import Any, Callable, List, no_type_check, Dict
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 from pydantic import BaseModel, create_model
@@ -22,6 +21,16 @@ from fastapi_mlflow._mlflow_types import (
     build_model_fields,
     MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP,
 )
+
+
+class PyFuncModelPredictError(Exception):
+    def __init__(self, exc: Exception):
+        super().__init__()
+        self.error_type_name = exc.__class__.__name__
+        self.message = str(exc)
+
+    def to_dict(self):
+        return {"name": self.error_type_name, "message": self.message}
 
 
 @no_type_check  # Some types here are too dynamic for type checking
@@ -69,7 +78,11 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
         return df
 
     def predictor(request: Request) -> Response:
-        predictions = model.predict(request_to_dataframe(request))
+        try:
+            predictions = model.predict(request_to_dataframe(request))
+        except Exception as exc:
+            raise PyFuncModelPredictError(exc) from exc
+
         response_data = convert_predictions_to_python(predictions)
         return Response(data=response_data)
 

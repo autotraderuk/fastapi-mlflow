@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Catch errors raised by ML model's predict method, format them as JSON, and return as the body of the 500 status response.
 
 ## [0.3.2] - 2022-01-13
 ### Fixed
@@ -13,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.1] - 2022-11-24
 ### Fixed
 - Assume that prediction output field(s) may be nullable. It's not uncommon to want ML models to return null or nan values at inference time (e.g. extrapolation outside of training data range).
-- Coerce nan values in output to null in JSON
+- Coerce nan values in output to null in JSON.
 
 ## [0.3.0] - 2022-10-07
 ### Added
