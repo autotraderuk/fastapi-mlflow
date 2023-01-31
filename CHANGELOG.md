@@ -5,10 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.4.0] - 2023-01-31
 ### Added
 - Catch errors raised by ML model's predict method, format them as JSON, and return as the body of the 500 status response.
 
-## [0.3.2] - 2022-01-13
+## [0.3.2] - 2023-01-13
 ### Fixed
 - Support strings for predictions in array-like structures
 
