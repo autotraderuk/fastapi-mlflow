@@ -13,6 +13,7 @@ Copyright (C) 2022, Auto Trader UK
 import os.path
 from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory
+from typing import Any, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -122,6 +123,25 @@ def model_input() -> pd.DataFrame:
     )
 
 
+def _get_pyfunc_model(
+    python_model: PythonModel,
+    model_input: pd.DataFrame,
+    model_output: Any,
+) -> PyFuncModel:
+    signature = infer_signature(
+        model_input=model_input,
+        model_output=model_output,
+    )
+    with TemporaryDirectory() as temp_dir:
+        model_path = os.path.join(temp_dir, python_model.__class__.__name__)
+        pyfunc_save_model(
+            model_path,
+            python_model=python_model,
+            signature=signature,
+        )
+        yield pyfunc_load_model(model_path)
+
+
 # Model with ndarray output
 
 
@@ -143,18 +163,7 @@ def pyfunc_model_ndarray(
     model_input: pd.DataFrame,
     model_output_ndarray: npt.ArrayLike,
 ) -> PyFuncModel:
-    signature = infer_signature(
-        model_input=model_input,
-        model_output=model_output_ndarray,
-    )
-    with TemporaryDirectory() as temp_dir:
-        model_path = os.path.join(temp_dir, "model_ndarray")
-        pyfunc_save_model(
-            model_path,
-            python_model=python_model_ndarray,
-            signature=signature,
-        )
-        yield pyfunc_load_model(model_path)
+    yield from _get_pyfunc_model(python_model_ndarray, model_input, model_output_ndarray)
 
 
 # Model with Series output
@@ -162,6 +171,7 @@ def pyfunc_model_ndarray(
 
 @pytest.fixture(scope="session")
 def python_model_series() -> PythonModel:
+    """Model with Series output."""
     return DeepThoughtSeries()
 
 
@@ -178,18 +188,7 @@ def pyfunc_model_series(
     model_input: pd.DataFrame,
     model_output_series: pd.Series,
 ) -> PyFuncModel:
-    signature = infer_signature(
-        model_input=model_input,
-        model_output=model_output_series,
-    )
-    with TemporaryDirectory() as temp_dir:
-        model_path = os.path.join(temp_dir, "model_series")
-        pyfunc_save_model(
-            model_path,
-            python_model=python_model_series,
-            signature=signature,
-        )
-        yield pyfunc_load_model(model_path)
+    yield from _get_pyfunc_model(python_model_series, model_input, model_output_series)
 
 
 # Model with DataFrame output
@@ -197,6 +196,7 @@ def pyfunc_model_series(
 
 @pytest.fixture(scope="session")
 def python_model_dataframe() -> PythonModel:
+    """Model with DataFrame output."""
     return DeepThoughtDataframe()
 
 
@@ -213,25 +213,15 @@ def pyfunc_model_dataframe(
     model_input: pd.DataFrame,
     model_output_dataframe: pd.DataFrame,
 ) -> PyFuncModel:
-    signature = infer_signature(
-        model_input=model_input,
-        model_output=model_output_dataframe,
-    )
-    with TemporaryDirectory() as temp_dir:
-        model_path = os.path.join(temp_dir, "model_dataframe")
-        pyfunc_save_model(
-            model_path,
-            python_model=python_model_dataframe,
-            signature=signature,
-        )
-        yield pyfunc_load_model(model_path)
+    yield from _get_pyfunc_model(python_model_dataframe, model_input, model_output_dataframe)
 
 
-# Model with ndarray output of NaNs
+# Models that can output NaNs
 
 
 @pytest.fixture(scope="session")
 def python_model_nan_ndarray() -> PythonModel:
+    """Model with ndarray output of NaNs."""
     return NaNModel()
 
 
@@ -248,18 +238,7 @@ def pyfunc_model_nan_ndarray(
     model_input: pd.DataFrame,
     model_output_ndarray: npt.ArrayLike,  # Use to infer correct
 ) -> PyFuncModel:
-    signature = infer_signature(
-        model_input=model_input,
-        model_output=model_output_ndarray,
-    )
-    with TemporaryDirectory() as temp_dir:
-        model_path = os.path.join(temp_dir, "model_nan_ndarray")
-        pyfunc_save_model(
-            model_path,
-            python_model=python_model_nan_ndarray,
-            signature=signature,
-        )
-        yield pyfunc_load_model(model_path)
+    yield from _get_pyfunc_model(python_model_nan_ndarray, model_input, model_output_ndarray)
 
 
 @pytest.fixture(scope="session")
@@ -280,18 +259,7 @@ def pyfunc_model_nan_series(
     model_input: pd.DataFrame,
     model_output_series: pd.Series,  # Use to infer correct
 ) -> PyFuncModel:
-    signature = infer_signature(
-        model_input=model_input,
-        model_output=model_output_series,
-    )
-    with TemporaryDirectory() as temp_dir:
-        model_path = os.path.join(temp_dir, "model_nan_series")
-        pyfunc_save_model(
-            model_path,
-            python_model=python_model_nan_series,
-            signature=signature,
-        )
-        yield pyfunc_load_model(model_path)
+    yield from _get_pyfunc_model(python_model_nan_series, model_input, model_output_series)
 
 
 @pytest.fixture(scope="session")
@@ -312,18 +280,7 @@ def pyfunc_model_nan_dataframe(
     model_input: pd.DataFrame,
     model_output_nan_dataframe: pd.DataFrame,  # Use to infer correct
 ) -> PyFuncModel:
-    signature = infer_signature(
-        model_input=model_input,
-        model_output=model_output_nan_dataframe,
-    )
-    with TemporaryDirectory() as temp_dir:
-        model_path = os.path.join(temp_dir, "model_nan_dataframe")
-        pyfunc_save_model(
-            model_path,
-            python_model=python_model_nan_dataframe,
-            signature=signature,
-        )
-        yield pyfunc_load_model(model_path)
+    yield from _get_pyfunc_model(python_model_nan_dataframe, model_input, model_output_nan_dataframe)
 
 
 # Model that always raises exceptions
@@ -338,18 +295,7 @@ def pyfunc_model_value_error(
     model_input: pd.DataFrame,
     model_output_series: pd.Series,  # Use to infer correct
 ) -> PyFuncModel:
-    signature = infer_signature(
-        model_input=model_input,
-        model_output=model_output_series,
-    )
-    with TemporaryDirectory() as temp_dir:
-        model_path = os.path.join(temp_dir, "model_exceptions")
-        pyfunc_save_model(
-            model_path,
-            python_model=python_model_value_error,
-            signature=signature,
-        )
-        yield pyfunc_load_model(model_path)
+    yield from _get_pyfunc_model(python_model_value_error, model_input, model_output_series)
 
 
 @pytest.fixture(
