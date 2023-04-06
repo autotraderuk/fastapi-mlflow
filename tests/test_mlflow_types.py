@@ -9,7 +9,7 @@ from typing import Optional
 
 import pytest
 from mlflow.types.schema import Schema, ColSpec, DataType  # type: ignore
-from fastapi_mlflow._mlflow_types import build_model_fields
+from fastapi_mlflow._mlflow_types import build_model_fields, UnsupportedFieldTypeError
 
 
 @pytest.fixture
@@ -61,3 +61,9 @@ def test_build_model_fields_unnamed_nullable(schema_unnamed: Schema):
     fields = build_model_fields(schema_unnamed, nullable=True)
     assert 1 == len(fields)
     assert Optional[int] == fields["prediction"][0]
+
+
+def test_build_model_fields_raises_error_on_unknown_type():
+    schema = Schema.from_json('[{"type": "tensor", "tensor-spec": {"dtype": "c", "shape": [-1]}}]')
+    with pytest.raises(UnsupportedFieldTypeError):
+        build_model_fields(schema)

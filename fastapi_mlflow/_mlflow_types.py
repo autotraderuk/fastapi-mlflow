@@ -23,11 +23,18 @@ MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
 }
 
 
+class UnsupportedFieldTypeError(Exception):
+    pass
+
+
 def get_field(type_name: str, nullable: bool):
     """
     :param nullable (bool): Should field be nullable
     """
-    type_ = MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP.get(type_name)
+    try:
+        type_ = MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP[type_name]
+    except KeyError:
+        raise UnsupportedFieldTypeError(f"Field type not supported: {type_name}")
     if nullable:
         type_ = Optional[type_]
 
