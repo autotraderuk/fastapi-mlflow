@@ -18,6 +18,7 @@ MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
     "float32": float,
     "float64": float,
     "string": str,
+    "object": str,
     "binary": bytes,
     "datetime": Union[datetime, date],
 }
@@ -35,6 +36,7 @@ def get_field(type_name: str, nullable: bool):
         type_ = MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP[type_name]
     except KeyError:
         raise UnsupportedFieldTypeError(f"Field type not supported: {type_name}")
+
     if nullable:
         type_ = Optional[type_]
 
