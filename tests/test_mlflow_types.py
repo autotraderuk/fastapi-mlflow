@@ -36,7 +36,9 @@ def schema_unnamed() -> Schema:
 
 @pytest.fixture
 def schema_tensor() -> Schema:
-    return Schema.from_json('[{"type": "tensor", "tensor-spec": {"dtype": "object", "shape": [-1]}}]')
+    return Schema.from_json(
+        '[{"type": "tensor", "tensor-spec": {"dtype": "object", "shape": [-1]}}]'
+    )
 
 
 def test_build_model_fields(schema: Schema):
@@ -47,7 +49,6 @@ def test_build_model_fields(schema: Schema):
     assert float == fields["float"][0]
     assert float == fields["double"][0]
     assert str == fields["string"][0]
-
 
 
 def test_build_model_fields_handles_unnamed(schema_unnamed: Schema):
@@ -73,7 +74,9 @@ def test_build_model_fields_handles_unnamed_fields_nullable(schema_unnamed: Sche
 
 
 def test_build_model_fields_raises_error_on_unknown_type():
-    schema = Schema.from_json('[{"type": "tensor", "tensor-spec": {"dtype": "c", "shape": [-1]}}]')
+    schema = Schema.from_json(
+        '[{"type": "tensor", "tensor-spec": {"dtype": "c", "shape": [-1]}}]'
+    )
     with pytest.raises(UnsupportedFieldTypeError):
         build_model_fields(schema)
 
@@ -88,4 +91,3 @@ def test_build_model_fields_handles_tensors_of_str_nullable(schema_tensor):
     fields = build_model_fields(schema_tensor, nullable=True)
     assert 1 == len(fields)
     assert Optional[str] == fields["prediction"][0]
-

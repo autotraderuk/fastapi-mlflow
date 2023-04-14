@@ -114,9 +114,7 @@ class TestStrPyFuncModel:
     ):
         """PyFunc model with array of str return type should predict correct values."""
         ndarray = pyfunc_model_str_ndarray.predict(model_input)
-        assert np.equal(
-            model_output_str_ndarray, ndarray
-        ).all()
+        assert np.equal(model_output_str_ndarray, ndarray).all()
 
 
 class TestStrSeriesPyFuncModel:

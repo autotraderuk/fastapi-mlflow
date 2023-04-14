@@ -13,7 +13,7 @@ Copyright (C) 2022, Auto Trader UK
 import os.path
 from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import numpy.typing as npt
@@ -177,7 +177,9 @@ def pyfunc_model_ndarray(
     model_input: pd.DataFrame,
     model_output_ndarray: npt.ArrayLike,
 ) -> PyFuncModel:
-    yield from _get_pyfunc_model(python_model_ndarray, model_input, model_output_ndarray)
+    yield from _get_pyfunc_model(
+        python_model_ndarray, model_input, model_output_ndarray
+    )
 
 
 # Model with Series output
@@ -227,7 +229,9 @@ def pyfunc_model_dataframe(
     model_input: pd.DataFrame,
     model_output_dataframe: pd.DataFrame,
 ) -> PyFuncModel:
-    yield from _get_pyfunc_model(python_model_dataframe, model_input, model_output_dataframe)
+    yield from _get_pyfunc_model(
+        python_model_dataframe, model_input, model_output_dataframe
+    )
 
 
 # Models that can output NaNs
@@ -241,7 +245,7 @@ def python_model_nan_ndarray() -> PythonModel:
 
 @pytest.fixture(scope="session")
 def model_output_nan_ndarray(
-        python_model_nan_ndarray, model_input: pd.DataFrame
+    python_model_nan_ndarray, model_input: pd.DataFrame
 ) -> npt.ArrayLike:
     return python_model_nan_ndarray.predict(context=None, model_input=model_input)
 
@@ -252,7 +256,9 @@ def pyfunc_model_nan_ndarray(
     model_input: pd.DataFrame,
     model_output_ndarray: npt.ArrayLike,  # Use to infer correct
 ) -> PyFuncModel:
-    yield from _get_pyfunc_model(python_model_nan_ndarray, model_input, model_output_ndarray)
+    yield from _get_pyfunc_model(
+        python_model_nan_ndarray, model_input, model_output_ndarray
+    )
 
 
 @pytest.fixture(scope="session")
@@ -262,7 +268,7 @@ def python_model_nan_series() -> PythonModel:
 
 @pytest.fixture(scope="session")
 def model_output_nan_series(
-        python_model_nan_series, model_input: pd.DataFrame
+    python_model_nan_series, model_input: pd.DataFrame
 ) -> pd.Series:
     return python_model_nan_series.predict(context=None, model_input=model_input)
 
@@ -273,7 +279,9 @@ def pyfunc_model_nan_series(
     model_input: pd.DataFrame,
     model_output_series: pd.Series,  # Use to infer correct
 ) -> PyFuncModel:
-    yield from _get_pyfunc_model(python_model_nan_series, model_input, model_output_series)
+    yield from _get_pyfunc_model(
+        python_model_nan_series, model_input, model_output_series
+    )
 
 
 @pytest.fixture(scope="session")
@@ -294,7 +302,9 @@ def pyfunc_model_nan_dataframe(
     model_input: pd.DataFrame,
     model_output_nan_dataframe: pd.DataFrame,  # Use to infer correct
 ) -> PyFuncModel:
-    yield from _get_pyfunc_model(python_model_nan_dataframe, model_input, model_output_nan_dataframe)
+    yield from _get_pyfunc_model(
+        python_model_nan_dataframe, model_input, model_output_nan_dataframe
+    )
 
 
 # Models that returns a sequence of strings
@@ -356,7 +366,9 @@ def pyfunc_model_value_error(
     model_input: pd.DataFrame,
     model_output_series: pd.Series,  # Use to infer correct
 ) -> PyFuncModel:
-    yield from _get_pyfunc_model(python_model_value_error, model_input, model_output_series)
+    yield from _get_pyfunc_model(
+        python_model_value_error, model_input, model_output_series
+    )
 
 
 @pytest.fixture(
