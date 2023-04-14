@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Raise an error for unsupported field types. Previously would silently return a `None` resulting in request time errors.
 - Support objects for predictions in array-like structures by mapping them to strings
+- Improve support for models that return 1d arrays / tensors of strings
 
 ## [0.4.0] - 2023-01-31
 ### Added

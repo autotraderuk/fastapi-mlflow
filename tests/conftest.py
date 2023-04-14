@@ -94,6 +94,20 @@ class NaNModelDataFrame(PythonModel):
         )
 
 
+class StrModel(PythonModel):
+    def predict(
+        self, context: PythonModelContext, model_input: pd.DataFrame
+    ) -> npt.ArrayLike:
+        return np.array(["42"] * len(model_input))
+
+
+class StrModelSeries(PythonModel):
+    def predict(
+        self, context: PythonModelContext, model_input: pd.DataFrame
+    ) -> pd.Series:
+        return pd.Series(StrModel().predict(context, model_input))
+
+
 class ExceptionRaiser(PythonModel):
     def predict(
         self, context: PythonModelContext, model_input: pd.DataFrame
@@ -283,6 +297,53 @@ def pyfunc_model_nan_dataframe(
     yield from _get_pyfunc_model(python_model_nan_dataframe, model_input, model_output_nan_dataframe)
 
 
+# Models that returns a sequence of strings
+@pytest.fixture(scope="session")
+def python_model_str_ndarray() -> PythonModel:
+    return StrModel()
+
+
+@pytest.fixture(scope="session")
+def model_output_str_ndarray(
+    python_model_str_ndarray, model_input: pd.DataFrame
+) -> npt.ArrayLike:
+    return python_model_str_ndarray.predict(context=None, model_input=model_input)
+
+
+@pytest.fixture(scope="session")
+def pyfunc_model_str_ndarray(
+    python_model_str_ndarray: PythonModel,
+    model_input: pd.DataFrame,
+    model_output_str_ndarray: npt.ArrayLike,  # Use to infer correct
+) -> PyFuncModel:
+    yield from _get_pyfunc_model(
+        python_model_str_ndarray, model_input, model_output_str_ndarray
+    )
+
+
+@pytest.fixture(scope="session")
+def python_model_str_series() -> PythonModel:
+    return StrModelSeries()
+
+
+@pytest.fixture(scope="session")
+def model_output_str_series(
+    python_model_str_series, model_input: pd.DataFrame
+) -> pd.Series:
+    return python_model_str_series.predict(context=None, model_input=model_input)
+
+
+@pytest.fixture(scope="session")
+def pyfunc_model_str_series(
+    python_model_str_series: PythonModel,
+    model_input: pd.DataFrame,
+    model_output_str_series: pd.Series,  # Use to infer correct
+) -> PyFuncModel:
+    yield from _get_pyfunc_model(
+        python_model_str_series, model_input, model_output_str_series
+    )
+
+
 # Model that always raises exceptions
 @pytest.fixture(scope="session")
 def python_model_value_error() -> PythonModel:
@@ -306,6 +367,8 @@ def pyfunc_model_value_error(
         "nan_ndarray",
         "nan_series",
         "nan_dataframe",
+        "str_ndarray",
+        "str_series",
     ]
 )
 def pyfunc_model(request: pytest.FixtureRequest) -> PyFuncModel:

@@ -18,6 +18,7 @@ MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
     "float32": float,
     "float64": float,
     "string": str,
+    "str": str,
     "object": str,
     "binary": bytes,
     "datetime": Union[datetime, date],

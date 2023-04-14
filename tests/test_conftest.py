@@ -102,6 +102,38 @@ class TestNaNDataFramePyFuncModel:
         assert df["b"].isna().all()
 
 
+class TestStrPyFuncModel:
+    def test_pyfunc_model_str_instance(self, pyfunc_model_str_ndarray):
+        assert isinstance(pyfunc_model_str_ndarray, PyFuncModel)
+
+    def test_pyfunc_model_str_predict(
+        self,
+        pyfunc_model_str_ndarray,
+        model_input: pd.DataFrame,
+        model_output_str_ndarray: npt.ArrayLike,
+    ):
+        """PyFunc model with array of str return type should predict correct values."""
+        ndarray = pyfunc_model_str_ndarray.predict(model_input)
+        assert np.equal(
+            model_output_str_ndarray, ndarray
+        ).all()
+
+
+class TestStrSeriesPyFuncModel:
+    def test_pyfunc_model_str_series_instance(self, pyfunc_model_str_series):
+        assert isinstance(pyfunc_model_str_series, PyFuncModel)
+
+    def test_pyfunc_model_series_str_predict(
+        self,
+        pyfunc_model_str_series,
+        model_input: pd.DataFrame,
+        model_output_str_series,
+    ):
+        """PyFunc model with str Series return type should predict correct values."""
+        series = pyfunc_model_str_series.predict(model_input)
+        pd.testing.assert_series_equal(model_output_str_series, series)
+
+
 def test_pyfunc_model_signature_inputs(pyfunc_model_ndarray):
     schema = pyfunc_model_ndarray.metadata.get_input_schema()
     schema_dict = schema.to_dict()
