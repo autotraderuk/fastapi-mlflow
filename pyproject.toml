@@ -8,13 +8,13 @@ repository = "https://github.com/autotraderuk/fastapi-mlflow"
 license = "Apache-2.0"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8"
 mlflow = "^1.23.0"
 pydantic = "^1.9.0"
 fastapi = ">=0.73.0"
 
-[tool.poetry.dev-dependencies]
-black = "^21.12b0"
+[tool.poetry.group.dev.dependencies]
+black = ">=22"
 fastapi = {extras = ["all"], version = "^0.88.0"}
 flake8-bugbear = "^22.1.11"
 isort = "^5.10.1"
