@@ -7,6 +7,7 @@ Copyright (C) 2022, Auto Trader UK
 from datetime import datetime
 from inspect import signature
 from typing import Union
+from unittest.mock import patch
 
 import numpy as np
 import numpy.typing as npt
@@ -15,11 +16,8 @@ import pydantic
 import pytest
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 
-from fastapi_mlflow.predictors import (
-    build_predictor,
-    convert_predictions_to_python,
-    PyFuncModelPredictError,
-)
+from fastapi_mlflow.exceptions import DictSerialisableException
+from fastapi_mlflow.predictors import build_predictor, convert_predictions_to_python
 
 
 def test_build_predictor_returns_callable(
@@ -152,7 +150,7 @@ def test_predictor_handles_model_returning_nan(
             assert item.b is None
 
 
-def test_predictor_exception_from_model_raised_from(
+def test_predictor_raises_custom_wrapped_exception_on_model_error(
     model_input: pd.DataFrame, pyfunc_model_value_error: PyFuncModel
 ):
     predictor = build_predictor(pyfunc_model_value_error)
@@ -160,8 +158,23 @@ def test_predictor_exception_from_model_raised_from(
     request_type = signature(predictor).parameters["request"].annotation
     request_obj = request_type(data=model_input.to_dict(orient="records"))
 
-    with pytest.raises(PyFuncModelPredictError):
+    with pytest.raises(DictSerialisableException):
         predictor(request_obj)
+
+
+def test_predictor_raises_custom_wrapped_exception_on_model_output_conversion(
+    model_input: pd.DataFrame,
+    pyfunc_model_ndarray: PyFuncModel,
+):
+    predictor = build_predictor(pyfunc_model_ndarray)
+
+    request_type = signature(predictor).parameters["request"].annotation
+    request_obj = request_type(data=model_input.to_dict(orient="records"))
+
+    with patch.object(pyfunc_model_ndarray, "predict") as predict:
+        predict.return_value = ["Fail!"]
+        with pytest.raises(DictSerialisableException):
+            predictor(request_obj) * len(model_input)
 
 
 def test_convert_predictions_to_python_ndarray():

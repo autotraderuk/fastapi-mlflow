@@ -13,7 +13,9 @@ from fastapi import (
 from fastapi.responses import JSONResponse
 
 from mlflow.pyfunc import PyFuncModel  # type: ignore
-from fastapi_mlflow.predictors import build_predictor, PyFuncModelPredictError
+
+from fastapi_mlflow.exceptions import DictSerialisableException
+from fastapi_mlflow.predictors import build_predictor
 
 
 def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
@@ -29,7 +31,7 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
     )
 
     @app.exception_handler(Exception)
-    def handle_exception(_: Request, exc: PyFuncModelPredictError):
+    def handle_exception(_: Request, exc: DictSerialisableException):
         return JSONResponse(
             status_code=500,
             content=exc.to_dict(),
