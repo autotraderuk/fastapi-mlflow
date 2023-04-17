@@ -5,10 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.4.1] - 2023-04-17
 ### Fixed
 - Raise an error for unsupported field types. Previously would silently return a `None` resulting in request time errors.
 - Support objects for predictions in array-like structures by mapping them to strings
 - Improve support for models that return 1d arrays / tensors of strings
+- Catch errors when model result does not conform to expected schema, and format as JSON response
 
 ## [0.4.0] - 2023-01-31
 ### Added
