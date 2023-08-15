@@ -68,7 +68,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
 
         return df
 
-    def predictor(request: Request) -> Response:
+    async def predictor(request: Request) -> Response:
         try:
             predictions = model.predict(request_to_dataframe(request))
             response_data = convert_predictions_to_python(predictions)

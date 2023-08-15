@@ -5,7 +5,7 @@ Copyright (C) 2022, Auto Trader UK
 
 """
 from datetime import datetime
-from inspect import signature
+from inspect import signature, iscoroutine
 from typing import Union
 from unittest.mock import patch
 
@@ -96,11 +96,12 @@ def test_predictor_has_correct_return_type(
     assert "ResponseRow" in schema["definitions"]
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "pyfunc_output_type",
     ["ndarray", "series", "dataframe"],
 )
-def test_predictor_correctly_applies_model(
+async def test_predictor_correctly_applies_model(
     model_input: pd.DataFrame,
     pyfunc_output_type: str,
     request: pytest.FixtureRequest,
@@ -116,7 +117,7 @@ def test_predictor_correctly_applies_model(
 
     request_type = signature(predictor).parameters["request"].annotation
     request_obj = request_type(data=model_input.to_dict(orient="records"))
-    response = predictor(request_obj)
+    response = await predictor(request_obj)
     try:
         assert response.data == model_output.to_dict(orient="records")  # type: ignore
     except (AttributeError, TypeError):
@@ -124,11 +125,12 @@ def test_predictor_correctly_applies_model(
         assert predictions == model_output.tolist()  # type: ignore
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "pyfunc_output_type",
     ["ndarray", "series", "dataframe"],
 )
-def test_predictor_handles_model_returning_nan(
+async def test_predictor_handles_model_returning_nan(
     model_input: pd.DataFrame,
     pyfunc_output_type: str,
     request: pytest.FixtureRequest,
@@ -141,7 +143,7 @@ def test_predictor_handles_model_returning_nan(
 
     request_type = signature(predictor).parameters["request"].annotation
     request_obj = request_type(data=model_input.to_dict(orient="records"))
-    response = predictor(request_obj)
+    response = await predictor(request_obj)
     for item in response.data:
         if pyfunc_output_type in ("ndarray", "series"):
             assert item.prediction is None
@@ -150,7 +152,8 @@ def test_predictor_handles_model_returning_nan(
             assert item.b is None
 
 
-def test_predictor_raises_custom_wrapped_exception_on_model_error(
+@pytest.mark.asyncio
+async def test_predictor_raises_custom_wrapped_exception_on_model_error(
     model_input: pd.DataFrame, pyfunc_model_value_error: PyFuncModel
 ):
     predictor = build_predictor(pyfunc_model_value_error)
@@ -159,10 +162,11 @@ def test_predictor_raises_custom_wrapped_exception_on_model_error(
     request_obj = request_type(data=model_input.to_dict(orient="records"))
 
     with pytest.raises(DictSerialisableException):
-        predictor(request_obj)
+        await predictor(request_obj)
 
 
-def test_predictor_raises_custom_wrapped_exception_on_model_output_conversion(
+@pytest.mark.asyncio
+async def test_predictor_raises_custom_wrapped_exception_on_model_output_conversion(
     model_input: pd.DataFrame,
     pyfunc_model_ndarray: PyFuncModel,
 ):
@@ -174,7 +178,7 @@ def test_predictor_raises_custom_wrapped_exception_on_model_output_conversion(
     with patch.object(pyfunc_model_ndarray, "predict") as predict:
         predict.return_value = ["Fail!"]
         with pytest.raises(DictSerialisableException):
-            predictor(request_obj) * len(model_input)
+            await predictor(request_obj) * len(model_input)
 
 
 def test_convert_predictions_to_python_ndarray():
