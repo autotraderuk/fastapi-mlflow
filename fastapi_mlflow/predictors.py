@@ -10,7 +10,7 @@ Current supports only the pyfunc flavour.
 Copyright (C) 2022, Auto Trader UK
 
 """
-from typing import Any, Callable, List, no_type_check, Dict
+from typing import Any, Callable, Dict, List, no_type_check
 
 import numpy as np
 import pandas as pd
@@ -18,8 +18,8 @@ from mlflow.pyfunc import PyFuncModel  # type: ignore
 from pydantic import BaseModel, create_model
 
 from fastapi_mlflow._mlflow_types import (
-    build_model_fields,
     MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP,
+    build_model_fields,
 )
 from fastapi_mlflow.exceptions import DictSerialisableException
 

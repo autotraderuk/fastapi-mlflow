@@ -6,12 +6,8 @@ Copyright (C) 2022, Auto Trader UK
 """
 from inspect import signature
 
-from fastapi import (
-    FastAPI,
-    Request,
-)
+from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
-
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 
 from fastapi_mlflow.exceptions import DictSerialisableException
@@ -32,7 +28,9 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
     )
 
     @app.exception_handler(DictSerialisableException)
-    def handle_serialisable_exception(_: Request, exc: DictSerialisableException) -> ORJSONResponse:
+    def handle_serialisable_exception(
+        _: Request, exc: DictSerialisableException
+    ) -> ORJSONResponse:
         return ORJSONResponse(
             status_code=500,
             content=exc.to_dict(),

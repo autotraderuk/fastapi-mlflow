@@ -8,8 +8,9 @@ Created 21. Nov 2022
 from typing import Optional
 
 import pytest
-from mlflow.types.schema import Schema, ColSpec, DataType  # type: ignore
-from fastapi_mlflow._mlflow_types import build_model_fields, UnsupportedFieldTypeError
+from mlflow.types.schema import ColSpec, DataType, Schema  # type: ignore
+
+from fastapi_mlflow._mlflow_types import UnsupportedFieldTypeError, build_model_fields
 
 
 @pytest.fixture
