@@ -41,11 +41,11 @@ def test_predictor_has_correct_signature_for_input(
         "type in predictor function parameter `request` is not a"
         "subclass of pydantic.BaseModel"
     )
-    schema = request_type.schema()
+    schema = request_type.model_json_schema()
     assert "data" in schema["required"]
     assert schema["properties"]["data"]["type"] == "array"
-    assert "RequestRow" in schema["definitions"]
-    assert schema["definitions"]["RequestRow"]["required"] == list(model_input.columns)
+    assert "RequestRow" in schema["$defs"]
+    assert schema["$defs"]["RequestRow"]["required"] == list(model_input.columns)
 
 
 def test_predictor_signature_type_can_be_constructed(
@@ -90,10 +90,10 @@ def test_predictor_has_correct_return_type(
         "type in predictor function parameter `request` is not a"
         "subclass of pydantic.BaseModel"
     )
-    schema = return_type.schema()
+    schema = return_type.model_json_schema()
     assert "data" in schema["required"]
     assert schema["properties"]["data"]["type"] == "array"
-    assert "ResponseRow" in schema["definitions"]
+    assert "ResponseRow" in schema["$defs"]
 
 
 @pytest.mark.asyncio
@@ -119,7 +119,7 @@ async def test_predictor_correctly_applies_model(
     request_obj = request_type(data=model_input.to_dict(orient="records"))
     response = await predictor(request_obj)
     try:
-        assert response.data == model_output.to_dict(orient="records")  # type: ignore
+        assert [row.model_dump() for row in response.data] == model_output.to_dict(orient="records")  # type: ignore
     except (AttributeError, TypeError):
         predictions = [item.prediction for item in response.data]
         assert predictions == model_output.tolist()  # type: ignore

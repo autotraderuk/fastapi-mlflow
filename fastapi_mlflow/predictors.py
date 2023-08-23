@@ -55,7 +55,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
         data: List[output_model]
 
     def request_to_dataframe(request: Request) -> pd.DataFrame:
-        df = pd.DataFrame([row.dict() for row in request.data], dtype=object)
+        df = pd.DataFrame([row.model_dump() for row in request.data], dtype=object)
         for item in input_schema.to_dict():
             if item["type"] in ("integer", "int32"):
                 df[item["name"]] = df[item["name"]].astype(np.int32)
