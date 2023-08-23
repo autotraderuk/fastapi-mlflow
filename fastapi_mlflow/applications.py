@@ -10,7 +10,7 @@ from fastapi import (
     FastAPI,
     Request,
 )
-from fastapi.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
 
 from mlflow.pyfunc import PyFuncModel  # type: ignore
 
@@ -27,12 +27,13 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
         "/predictions",
         predictor,
         response_model=response_model,
+        response_class=ORJSONResponse,
         methods=["POST"],
     )
 
     @app.exception_handler(Exception)
     def handle_exception(_: Request, exc: DictSerialisableException):
-        return JSONResponse(
+        return ORJSONResponse(
             status_code=500,
             content=exc.to_dict(),
         )
