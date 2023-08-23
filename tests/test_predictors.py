@@ -119,7 +119,8 @@ async def test_predictor_correctly_applies_model(
     request_obj = request_type(data=model_input.to_dict(orient="records"))
     response = await predictor(request_obj)
     try:
-        assert [row.model_dump() for row in response.data] == model_output.to_dict(orient="records")  # type: ignore
+        rows = [row.model_dump() for row in response.data]
+        assert rows == model_output.to_dict(orient="records")  # type: ignore
     except (AttributeError, TypeError):
         predictions = [item.prediction for item in response.data]
         assert predictions == model_output.tolist()  # type: ignore
