@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Fixed
 - Adapt to pydantic 2.x API changes
+- Assume naive datetimes to be UTC
 
 ## [0.6.1] - 2023-08-23
 ### Fixed

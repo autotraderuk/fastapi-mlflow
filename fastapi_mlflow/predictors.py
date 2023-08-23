@@ -60,7 +60,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
             if item["type"] in ("integer", "int32"):
                 df[item["name"]] = df[item["name"]].astype(np.int32)
             elif item["type"] == "datetime":
-                df[item["name"]] = pd.to_datetime(df[item["name"]])
+                df[item["name"]] = pd.to_datetime(df[item["name"]], utc=True)
             else:
                 df[item["name"]] = df[item["name"]].astype(
                     MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP.get(item["type"], object)
