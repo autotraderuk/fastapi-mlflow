@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Return an asynchronous function from build_predictor
 - Use orjson to serialize responses from app returned by build_app
 - Improved error handling in app returned by `build_app`; will catch and format generic `Exceptions`
+- Use newer pydantic and fastapi for potential performance improvements
 
 ## [0.5.0] - 2023-06-09
 ### Added
