@@ -31,11 +31,17 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
         methods=["POST"],
     )
 
-    @app.exception_handler(Exception)
-    def handle_exception(_: Request, exc: DictSerialisableException):
+    @app.exception_handler(DictSerialisableException)
+    def handle_serialisable_exception(_: Request, exc: DictSerialisableException) -> ORJSONResponse:
         return ORJSONResponse(
             status_code=500,
             content=exc.to_dict(),
+        )
+
+    @app.exception_handler(Exception)
+    def handle_exception(_: Request, exc: Exception) -> ORJSONResponse:
+        return handle_serialisable_exception(
+            DictSerialisableException.from_exception(exc)
         )
 
     return app

@@ -6,10 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.6.0.beta1] - 2023-08-21
+## [0.6.0.beta1] - 2023-08-23
 ### Changed
 - Return an asynchronous function from build_predictor
 - Use orjson to serialize responses from app returned by build_app
+- Improved error handling in app returned by `build_app`; will catch and format generic `Exceptions`
 
 ## [0.5.0] - 2023-06-09
 ### Added
