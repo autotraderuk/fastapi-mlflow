@@ -37,9 +37,9 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
         )
 
     @app.exception_handler(Exception)
-    def handle_exception(_: Request, exc: Exception) -> ORJSONResponse:
+    def handle_exception(req: Request, exc: Exception) -> ORJSONResponse:
         return handle_serialisable_exception(
-            DictSerialisableException.from_exception(exc)
+            req, DictSerialisableException.from_exception(exc)
         )
 
     return app
