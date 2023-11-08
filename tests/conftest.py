@@ -109,10 +109,14 @@ class StrModelSeries(PythonModel):
 
 
 class ExceptionRaiser(PythonModel):
+    """A PythonModle that always raises an exception."""
+
+    ERROR_MESSAGE = "I always raise an error!"
+
     def predict(
         self, context: PythonModelContext, model_input: pd.DataFrame
     ) -> pd.DataFrame:
-        raise ValueError("I always raise an error!")
+        raise ValueError(self.ERROR_MESSAGE)
 
 
 @pytest.fixture(scope="session")

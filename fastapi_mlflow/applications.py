@@ -4,6 +4,7 @@
 Copyright (C) 2022, Auto Trader UK
 
 """
+import logging
 from inspect import signature
 
 from fastapi import FastAPI, Request
@@ -16,6 +17,7 @@ from fastapi_mlflow.predictors import build_predictor
 
 def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
     """Build and return a FastAPI app for the mlflow model."""
+    logger = logging.getLogger(__name__)
     app = FastAPI()
     predictor = build_predictor(pyfunc_model)
     response_model = signature(predictor).return_annotation
@@ -31,6 +33,8 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
     def handle_serialisable_exception(
         _: Request, exc: DictSerialisableException
     ) -> ORJSONResponse:
+        nonlocal logger
+        logger.exception(exc.message)
         return ORJSONResponse(
             status_code=500,
             content=exc.to_dict(),

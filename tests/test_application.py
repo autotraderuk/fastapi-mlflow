@@ -12,7 +12,7 @@ import pandas as pd
 import pytest as pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from mlflow.pyfunc import PyFuncModel  # type: ignore
+from mlflow.pyfunc import PyFuncModel, PythonModel  # type: ignore
 
 from fastapi_mlflow.applications import build_app
 
@@ -87,3 +87,22 @@ def test_built_application_handles_model_exceptions(
         "name": "ValueError",
         "message": "I always raise an error!",
     } == response.json()
+
+
+def test_built_application_logs_exceptions(
+    model_input: pd.DataFrame,
+    pyfunc_model_value_error: PyFuncModel,
+    python_model_value_error: PythonModel,
+    caplog: pytest.LogCaptureFixture,
+):
+    app = build_app(pyfunc_model_value_error)
+    client = TestClient(app, raise_server_exceptions=False)
+    df_str = model_input.to_json(orient="records")
+    request_data = f'{{"data": {df_str}}}'
+
+    _ = client.post("/predictions", content=request_data)
+
+    assert len(caplog.records) >= 1
+    log_record = caplog.records[-1]
+    assert log_record.name == "fastapi_mlflow.applications"
+    assert log_record.message == python_model_value_error.ERROR_MESSAGE
