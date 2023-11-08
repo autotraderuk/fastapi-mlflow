@@ -31,10 +31,12 @@ def build_app(pyfunc_model: PyFuncModel) -> FastAPI:
 
     @app.exception_handler(DictSerialisableException)
     def handle_serialisable_exception(
-        _: Request, exc: DictSerialisableException
+        req: Request, exc: DictSerialisableException
     ) -> ORJSONResponse:
         nonlocal logger
-        logger.exception(exc.message)
+        req_id = req.headers.get("x-request-id")
+        extra = {"x-request-id": req_id} if req_id is not None else {}
+        logger.exception(exc.message, extra=extra)
         return ORJSONResponse(
             status_code=500,
             content=exc.to_dict(),

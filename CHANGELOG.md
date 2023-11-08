@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Emit error message when an exception is handled by the built application
+- Emit error message when an exception is handled by the built application. Add `X-Request-ID` header value to log message when present
 
 ## [0.6.2] - 2023-08-23
 ### Fixed

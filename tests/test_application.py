@@ -106,3 +106,34 @@ def test_built_application_logs_exceptions(
     log_record = caplog.records[-1]
     assert log_record.name == "fastapi_mlflow.applications"
     assert log_record.message == python_model_value_error.ERROR_MESSAGE
+
+
+@pytest.mark.parametrize(
+    "req_id_header_name",
+    [
+        "x-request-id",
+        "X-Request-Id",
+        "X-Request-ID",
+        "X-REQUEST-ID",
+    ],
+)
+def test_built_application_logs_exceptions_including_request_id_header_when_sent(
+    model_input: pd.DataFrame,
+    pyfunc_model_value_error: PyFuncModel,
+    python_model_value_error: PythonModel,
+    caplog: pytest.LogCaptureFixture,
+    req_id_header_name: str
+):
+    app = build_app(pyfunc_model_value_error)
+    client = TestClient(app, raise_server_exceptions=False)
+    df_str = model_input.to_json(orient="records")
+    request_data = f'{{"data": {df_str}}}'
+    request_id = "abcdef"
+
+    _ = client.post(
+        "/predictions", content=request_data, headers={req_id_header_name: request_id}
+    )
+
+    log_record = caplog.records[-1]
+    assert hasattr(log_record, "x-request-id")
+    assert getattr(log_record, "x-request-id") == request_id
