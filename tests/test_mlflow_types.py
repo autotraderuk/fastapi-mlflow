@@ -46,33 +46,33 @@ def schema_tensor() -> Schema:
 def test_build_model_fields(schema: Schema):
     fields = build_model_fields(schema)
     assert 5 == len(fields)
-    assert int == fields["integer"][0]
-    assert int == fields["long"][0]
-    assert float == fields["float"][0]
-    assert float == fields["double"][0]
-    assert str == fields["string"][0]
+    assert int is fields["integer"][0]
+    assert int is fields["long"][0]
+    assert float is fields["float"][0]
+    assert float is fields["double"][0]
+    assert str is fields["string"][0]
 
 
 def test_build_model_fields_handles_unnamed(schema_unnamed: Schema):
     fields = build_model_fields(schema_unnamed)
     assert 1 == len(fields)
-    assert int == fields["prediction"][0]
+    assert int is fields["prediction"][0]
 
 
 def test_build_model_fields_handles_nullable(schema: Schema):
     fields = build_model_fields(schema, nullable=True)
     assert 5 == len(fields)
-    assert Optional[int] == fields["integer"][0]
-    assert Optional[int] == fields["long"][0]
-    assert Optional[float] == fields["float"][0]
-    assert Optional[float] == fields["double"][0]
-    assert Optional[str] == fields["string"][0]
+    assert Optional[int] is fields["integer"][0]
+    assert Optional[int] is fields["long"][0]
+    assert Optional[float] is fields["float"][0]
+    assert Optional[float] is fields["double"][0]
+    assert Optional[str] is fields["string"][0]
 
 
 def test_build_model_fields_handles_unnamed_fields_nullable(schema_unnamed: Schema):
     fields = build_model_fields(schema_unnamed, nullable=True)
     assert 1 == len(fields)
-    assert Optional[int] == fields["prediction"][0]
+    assert Optional[int] is fields["prediction"][0]
 
 
 def test_build_model_fields_raises_error_on_unknown_type():
@@ -86,10 +86,10 @@ def test_build_model_fields_raises_error_on_unknown_type():
 def test_build_model_fields_handles_tensors_of_str(schema_tensor):
     fields = build_model_fields(schema_tensor)
     assert 1 == len(fields)
-    assert str == fields["prediction"][0]
+    assert str is fields["prediction"][0]
 
 
 def test_build_model_fields_handles_tensors_of_str_nullable(schema_tensor):
     fields = build_model_fields(schema_tensor, nullable=True)
     assert 1 == len(fields)
-    assert Optional[str] == fields["prediction"][0]
+    assert Optional[str] is fields["prediction"][0]

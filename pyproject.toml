@@ -23,10 +23,7 @@ pydantic = "^2.2.0"
 fastapi = ">=0.100.0, <1"
 
 [tool.poetry.group.dev.dependencies]
-black = ">=22"
 fastapi = {extras = ["all"], version = ">=0.100.0, <1"}
-flake8-bugbear = "^22.1.11"
-isort = "^5.10.1"
 mypy = "^1.3"
 pytest = "^7"
 pandas-stubs = "^1.2.0"
