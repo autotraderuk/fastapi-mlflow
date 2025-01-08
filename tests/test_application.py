@@ -40,6 +40,7 @@ def test_build_app_has_predictions_endpoint(pyfunc_model: PyFuncModel):
     assert response.status_code != 404
 
 
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "pyfunc_output_type",
     ["ndarray", "series", "dataframe"],

@@ -5,8 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Convert predictions back to Python objects asynchronously to take advantage of any concurrency magic in low-level pandas code.
+
 ### Fixed
-- Convert requests to pandas dataframe asynchronously to take advantage of any low level concurrency magic in low-level pandas code.
+- Convert requests to pandas dataframe asynchronously to take advantage of any concurrency magic in low-level pandas code.
 
 ### Removed
 - Support for Python 3.8

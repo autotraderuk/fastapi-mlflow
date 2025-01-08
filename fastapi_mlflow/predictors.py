@@ -72,7 +72,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     async def predictor(request: Request) -> Response:
         try:
             predictions = model.predict(await request_to_dataframe(request))
-            response_data = convert_predictions_to_python(predictions)
+            response_data = await convert_predictions_to_python(predictions)
             return Response(data=response_data)
         except Exception as exc:
             raise DictSerialisableException.from_exception(exc) from exc
@@ -80,7 +80,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     return predictor  # type: ignore
 
 
-def convert_predictions_to_python(results) -> List[Dict[str, Any]]:
+async def convert_predictions_to_python(results) -> List[Dict[str, Any]]:
     """Convert and return predictions in native Python types."""
     try:
         response_data = (

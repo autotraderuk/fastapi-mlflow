@@ -183,9 +183,10 @@ async def test_predictor_raises_custom_wrapped_exception_on_model_output_convers
             await predictor(request_obj) * len(model_input)
 
 
-def test_convert_predictions_to_python_ndarray():
+@pytest.mark.asyncio
+async def test_convert_predictions_to_python_ndarray():
     predictions = np.array([1, 2, 3, np.nan])
-    response_data = convert_predictions_to_python(predictions)
+    response_data = await convert_predictions_to_python(predictions)
     assert [
         {"prediction": 1},
         {"prediction": 2},
@@ -194,9 +195,10 @@ def test_convert_predictions_to_python_ndarray():
     ] == response_data
 
 
-def test_convert_predictions_to_python_ndarray_strings():
+@pytest.mark.asyncio
+async def test_convert_predictions_to_python_ndarray_strings():
     predictions = np.array(["foo", "bar", None])
-    response_data = convert_predictions_to_python(predictions)
+    response_data = await convert_predictions_to_python(predictions)
     assert [
         {"prediction": "foo"},
         {"prediction": "bar"},
@@ -204,18 +206,20 @@ def test_convert_predictions_to_python_ndarray_strings():
     ] == response_data
 
 
-def test_convert_predictions_to_python_ndarray_datetimes():
+@pytest.mark.asyncio
+async def test_convert_predictions_to_python_ndarray_datetimes():
     predictions = np.array([datetime(2023, 1, 1), None])
-    response_data = convert_predictions_to_python(predictions)
+    response_data = await convert_predictions_to_python(predictions)
     assert [
         {"prediction": datetime(2023, 1, 1)},
         {"prediction": None},
     ] == response_data
 
 
-def test_convert_predictions_to_python_series():
+@pytest.mark.asyncio
+async def test_convert_predictions_to_python_series():
     predictions = pd.Series([1, 2, 3, np.nan])
-    response_data = convert_predictions_to_python(predictions)
+    response_data = await convert_predictions_to_python(predictions)
     assert [
         {"prediction": 1},
         {"prediction": 2},
@@ -224,11 +228,12 @@ def test_convert_predictions_to_python_series():
     ] == response_data
 
 
-def test_convert_predictions_to_python_dataframe():
+@pytest.mark.asyncio
+async def test_convert_predictions_to_python_dataframe():
     predictions = pd.DataFrame(
         {"expected": [1, 2, 3, np.nan], "confidence": [0.0, 0.5, 1.0, None]}
     )
-    response_data = convert_predictions_to_python(predictions)
+    response_data = await convert_predictions_to_python(predictions)
     assert [
         {"expected": 1, "confidence": 0.0},
         {"expected": 2, "confidence": 0.5},
