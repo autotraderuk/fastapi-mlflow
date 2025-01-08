@@ -4,6 +4,7 @@
 Copyright (C) 2022, Auto Trader UK
 
 """
+
 from typing import Union
 
 import numpy as np
@@ -67,9 +68,7 @@ def test_build_app_returns_good_predictions(
     try:
         assert model_output.to_dict(orient="records") == results  # type: ignore
     except (AttributeError, TypeError):
-        assert [
-            {"prediction": v} for v in np.nditer(model_output)
-        ] == results  # type: ignore
+        assert [{"prediction": v} for v in np.nditer(model_output)] == results  # type: ignore
 
 
 def test_built_application_handles_model_exceptions(
@@ -122,7 +121,7 @@ def test_built_application_logs_exceptions_including_request_id_header_when_sent
     pyfunc_model_value_error: PyFuncModel,
     python_model_value_error: PythonModel,
     caplog: pytest.LogCaptureFixture,
-    req_id_header_name: str
+    req_id_header_name: str,
 ):
     app = build_app(pyfunc_model_value_error)
     client = TestClient(app, raise_server_exceptions=False)

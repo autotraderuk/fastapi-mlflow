@@ -4,6 +4,7 @@
 Copyright (C) 2022, Auto Trader UK
 
 """
+
 from datetime import datetime
 from inspect import signature
 from typing import Union

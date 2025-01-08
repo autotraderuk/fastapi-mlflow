@@ -4,6 +4,7 @@
 Copyright (C) 2022, Auto Trader UK
 
 """
+
 from datetime import date, datetime
 from typing import Dict, Optional, Union
 

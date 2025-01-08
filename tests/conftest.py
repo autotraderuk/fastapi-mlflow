@@ -10,6 +10,7 @@ complete test suite by a factor of approx 10x (~2s -> 20s)
 Copyright (C) 2022, Auto Trader UK
 
 """
+
 import os.path
 from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory

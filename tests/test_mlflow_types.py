@@ -5,6 +5,7 @@ Copyright (C) 2022, Auto Trader UK
 Created 21. Nov 2022
 
 """
+
 from typing import Optional
 
 import pytest

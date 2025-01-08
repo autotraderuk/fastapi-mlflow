@@ -10,6 +10,7 @@ Current supports only the pyfunc flavour.
 Copyright (C) 2022, Auto Trader UK
 
 """
+
 from typing import Any, Callable, Dict, List, no_type_check
 
 import numpy as np
@@ -45,7 +46,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     input_model = create_model("RequestRow", **(build_model_fields(input_schema)))
     output_model = create_model(
         "ResponseRow",
-        **(build_model_fields(model.metadata.get_output_schema(), nullable=True))
+        **(build_model_fields(model.metadata.get_output_schema(), nullable=True)),
     )
 
     class Request(BaseModel):
