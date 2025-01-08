@@ -55,7 +55,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
     class Response(BaseModel):
         data: List[output_model]
 
-    def request_to_dataframe(request: Request) -> pd.DataFrame:
+    async def request_to_dataframe(request: Request) -> pd.DataFrame:
         df = pd.DataFrame([row.model_dump() for row in request.data], dtype=object)
         for item in input_schema.to_dict():
             if item["type"] in ("integer", "int32"):
@@ -71,7 +71,7 @@ def build_predictor(model: PyFuncModel) -> Callable[[BaseModel], Any]:
 
     async def predictor(request: Request) -> Response:
         try:
-            predictions = model.predict(request_to_dataframe(request))
+            predictions = model.predict(await request_to_dataframe(request))
             response_data = convert_predictions_to_python(predictions)
             return Response(data=response_data)
         except Exception as exc:
