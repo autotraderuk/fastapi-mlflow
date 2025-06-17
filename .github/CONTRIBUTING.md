@@ -18,8 +18,8 @@ Code (including tests) contributions should pass static analysis, typing check, 
 
 If you set up your dev environment using the guide below, you should be able to run these using:
 
-- `poetry run flake8 fastapi_mlflow tests`
-- `poetry run black --check fastapi_mlflow tests`
+- `poetry run ruff format --check fastapi_mlflow tests`
+- `poetry run ruff check fastapi_mlflow tests`
 - `poetry run mypy fastapi_mlflow tests`
 
 ## Setting up the development environment
