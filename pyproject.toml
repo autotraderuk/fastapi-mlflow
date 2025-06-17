@@ -14,7 +14,7 @@ priority = "primary"
 
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = ">=3.9"
 mlflow = "^2.0.1"
 numpy = "^1.22.1"
 orjson = "^3.9.5"
