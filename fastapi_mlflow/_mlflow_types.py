@@ -6,7 +6,7 @@ Copyright (C) 2022, Auto Trader UK
 """
 
 from datetime import date, datetime
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Tuple
 
 MLFLOW_SIGNATURE_TO_PYTHON_TYPE_MAP = {
     "boolean": bool,
@@ -30,7 +30,7 @@ class UnsupportedFieldTypeError(Exception):
     pass
 
 
-def get_field(type_name: str, nullable: bool):
+def get_field(type_name: str, nullable: bool) -> Tuple:
     """
     :param nullable (bool): Should field be nullable
     """
@@ -46,7 +46,7 @@ def get_field(type_name: str, nullable: bool):
     return field
 
 
-def build_model_fields(schema, nullable: bool = False) -> Dict:
+def build_model_fields(schema, nullable: bool = False) -> Dict[str, Tuple]:
     """Return a dict mapping field names -> (type, default).
 
     :param nullable (bool): Should fields be nullable
