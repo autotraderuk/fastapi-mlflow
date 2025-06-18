@@ -12,7 +12,6 @@ Copyright (C) 2022, Auto Trader UK
 """
 
 import os.path
-from datetime import datetime, timedelta
 from tempfile import TemporaryDirectory
 from typing import Any, Generator
 

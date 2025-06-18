@@ -136,12 +136,16 @@ class TestStrSeriesPyFuncModel:
 def test_pyfunc_model_signature_inputs(pyfunc_model_ndarray):
     schema = pyfunc_model_ndarray.metadata.get_input_schema()
     schema_dict = schema.to_dict()
-    assert schema_dict == [
-        {"name": "int32", "type": "integer"},
-        {"name": "int64", "type": "long"},
-        {"name": "double", "type": "double"},
-        {"name": "bool", "type": "boolean"},
-        {"name": "bytes", "type": "binary"},
-        {"name": "str", "type": "string"},
-        {"name": "datetime", "type": "datetime"},
+    expected_scheme = [
+        {"required": True, **item}
+        for item in [
+            {"name": "int32", "type": "integer"},
+            {"name": "int64", "type": "long"},
+            {"name": "double", "type": "double"},
+            {"name": "bool", "type": "boolean"},
+            {"name": "bytes", "type": "binary"},
+            {"name": "str", "type": "string"},
+            {"name": "datetime", "type": "datetime"},
+        ]
     ]
+    assert schema_dict == expected_scheme
