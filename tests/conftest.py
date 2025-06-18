@@ -13,7 +13,7 @@ Copyright (C) 2022, Auto Trader UK
 
 import os.path
 from tempfile import TemporaryDirectory
-from typing import Any, Generator
+from typing import Any, Generator, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -32,7 +32,7 @@ class DeepThought(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> npt.ArrayLike:
         return np.full(len(model_input), 42, dtype=np.int64)
 
@@ -44,7 +44,7 @@ class DeepThoughtSeries(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> pd.Series:
         return pd.Series([42 for _ in model_input.iterrows()])
 
@@ -56,7 +56,7 @@ class DeepThoughtDataframe(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> pd.DataFrame:
         return pd.DataFrame(
             [
@@ -78,7 +78,7 @@ class NaNModel(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> npt.ArrayLike:
         return np.full(len(model_input), np.nan)
 
@@ -90,7 +90,7 @@ class NaNModelSeries(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> pd.Series:
         return pd.Series(NaNModel().predict(context, model_input))
 
@@ -102,7 +102,7 @@ class NaNModelDataFrame(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> pd.DataFrame:
         nan_model = NaNModelSeries()
         return pd.DataFrame(
@@ -118,7 +118,7 @@ class StrModel(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> npt.ArrayLike:
         return np.full(len(model_input), "42", dtype=object)
 
@@ -128,7 +128,7 @@ class StrModelSeries(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> pd.Series:
         return pd.Series(StrModel().predict(context, model_input))
 
@@ -142,7 +142,7 @@ class ExceptionRaiser(PythonModel):
         self,
         context: Any,
         model_input: pd.DataFrame,
-        params: dict[str, Any] | None = None,
+        params: Optional[dict[str, Any]] = None,
     ) -> pd.DataFrame:
         raise ValueError(self.ERROR_MESSAGE)
 
