@@ -38,10 +38,9 @@ class TestSeriesPyFuncModel:
         model_output_series: pd.Series,
     ):
         """PyFunc model with Series return type should predict correct values."""
-
-        pd.testing.assert_series_equal(
-            model_output_series, pyfunc_model_series.predict(model_input)
-        )
+        output = pyfunc_model_series.predict(model_input)
+        assert isinstance(output, pd.Series)
+        pd.testing.assert_series_equal(model_output_series, output)
 
 
 class TestDataFramePyFuncModel:
@@ -55,10 +54,9 @@ class TestDataFramePyFuncModel:
         model_output_dataframe: pd.DataFrame,
     ):
         """PyFunc model with DataFrame return type should predict correct values."""
-
-        pd.testing.assert_frame_equal(
-            model_output_dataframe, pyfunc_model_dataframe.predict(model_input)
-        )
+        output = pyfunc_model_dataframe.predict(model_input)
+        assert isinstance(output, pd.DataFrame)
+        pd.testing.assert_frame_equal(model_output_dataframe, output)
 
 
 class TestNaNNDArrayPyFuncModel:
