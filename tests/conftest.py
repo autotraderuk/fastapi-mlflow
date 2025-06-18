@@ -29,7 +29,10 @@ class DeepThought(PythonModel):
     """A simple PythonModel that returns `42` for each input row."""
 
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> npt.ArrayLike:
         return np.full(len(model_input), 42, dtype=np.int64)
 
@@ -38,7 +41,10 @@ class DeepThoughtSeries(PythonModel):
     """A PythonModel that returns a DataFrame."""
 
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> pd.Series:
         return pd.Series([42 for _ in model_input.iterrows()])
 
@@ -47,7 +53,10 @@ class DeepThoughtDataframe(PythonModel):
     """A PythonModel that returns a DataFrame."""
 
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> pd.DataFrame:
         return pd.DataFrame(
             [
@@ -66,7 +75,10 @@ class NaNModel(PythonModel):
     """A PythonModel that returns NaN."""
 
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> npt.ArrayLike:
         return np.full(len(model_input), np.nan)
 
@@ -75,7 +87,10 @@ class NaNModelSeries(PythonModel):
     """A PythonModel that returns NaNs in a Series."""
 
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> pd.Series:
         return pd.Series(NaNModel().predict(context, model_input))
 
@@ -84,7 +99,10 @@ class NaNModelDataFrame(PythonModel):
     """A PythonModel that returns NaNs in a DataFrame."""
 
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> pd.DataFrame:
         nan_model = NaNModelSeries()
         return pd.DataFrame(
@@ -97,14 +115,20 @@ class NaNModelDataFrame(PythonModel):
 
 class StrModel(PythonModel):
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> npt.ArrayLike:
         return np.full(len(model_input), "42", dtype=object)
 
 
 class StrModelSeries(PythonModel):
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> pd.Series:
         return pd.Series(StrModel().predict(context, model_input))
 
@@ -115,7 +139,10 @@ class ExceptionRaiser(PythonModel):
     ERROR_MESSAGE = "I always raise an error!"
 
     def predict(
-        self, context: Any, model_input: pd.DataFrame, params: dict[str, Any] | None = None
+        self,
+        context: Any,
+        model_input: pd.DataFrame,
+        params: dict[str, Any] | None = None,
     ) -> pd.DataFrame:
         raise ValueError(self.ERROR_MESSAGE)
 
