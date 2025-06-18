@@ -105,7 +105,7 @@ def test_built_application_logs_exceptions(
     assert len(caplog.records) >= 1
     log_record = caplog.records[-1]
     assert log_record.name == "fastapi_mlflow.applications"
-    assert log_record.message == python_model_value_error.ERROR_MESSAGE
+    assert log_record.message == python_model_value_error.ERROR_MESSAGE  # type: ignore
 
 
 @pytest.mark.parametrize(
