@@ -22,9 +22,9 @@ class TestNDArrayPyFuncModel:
         model_output_ndarray: npt.ArrayLike,
     ):
         """PyFunc model with ndarray return type should predict correct values."""
-        assert np.equal(
-            model_output_ndarray, pyfunc_model_ndarray.predict(model_input)
-        ).all()
+        output = pyfunc_model_ndarray.predict(model_input)
+        assert isinstance(output, np.ndarray)
+        assert np.array_equal(np.asarray(model_output_ndarray), output)
 
 
 class TestSeriesPyFuncModel:
