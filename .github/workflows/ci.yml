@@ -18,7 +18,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install poetry
+          pip install "poetry>=2,<3"
           poetry install --with dev
       - name: Run code format check
         run: |
@@ -58,8 +58,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install poetry
+        pip install "poetry>=2,<3"
         poetry install
+        poetry build
         poetry run pip install pandas==${{ matrix.pandas-version }}
     - name: Run tests
       run: |
