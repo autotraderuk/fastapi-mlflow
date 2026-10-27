@@ -2,6 +2,10 @@
 
 Deploy [mlflow](https://www.mlflow.org/) models as JSON APIs using [FastAPI](https://fastapi.tiangolo.com) with minimal new code.
 
+## Limitations
+
+The library supports only flat MLflow schemas with simple data types. Nested schemas, such as fields that contain objects or arrays, are not supported.
+
 ## Installation
 
 ```shell
